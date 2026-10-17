@@ -1,185 +1,221 @@
-/**
- * findings.js — assembles calculation results into labeled findings
- * (backs POST /analyze and POST /negotiate). Keeps three categories
- * separate; never produces a single blended "you're owed $X" number.
+/** Stub financial findings and negotiation estimates.
+ * The default rate and industry ranges are illustrative assumptions.
  */
-/**
- * @param {any} root
- * @param {(calc: any) => any} factory
- */
-(function (root, factory) {
-  // @ts-ignore -- `module`/`require` only exist under Node/CommonJS
-  var isNode = typeof module === 'object' && module.exports;
-  if (isNode) {
-    // @ts-ignore
-    module.exports = factory(require('./calculations'));
-  } else {
-    root.Findings = factory(root.Calculations);
+
+export interface ConfirmedInvoice {
+  invoiceAmount: number;
+  termsDays: number;
+  daysUntilPaid?: number;
+  discountTerms?: string | null;
+  industry?: string;
+}
+
+export interface BenchmarkRange {
+  low: number;
+  typical: number;
+  high: number;
+}
+
+export type BenchmarkTable = Record<string, BenchmarkRange>;
+
+export interface AnalyzeOptions {
+  rate?: number;
+  benchmarks?: BenchmarkTable;
+}
+
+export interface NegotiateOptions {
+  proposedDays: number;
+  invoicesPerYear?: number;
+  rate?: number;
+}
+
+export interface CustomerInvoice {
+  customerName: string;
+  costOfFloat: number | { estimatedCost: number };
+}
+
+export const DEFAULT_BENCHMARKS: BenchmarkTable = {
+  'general contracting': { low: 30, typical: 45, high: 60 },
+  consulting: { low: 15, typical: 30, high: 45 },
+  manufacturing: { low: 30, typical: 45, high: 60 }
+};
+
+export const DISCLAIMERS = [
+  'Invoice amount and stated payment terms come from the document and should be confirmed.',
+  'Financing cost is an estimate using an assumed rate, not a proven expense.',
+  'Industry payment-term ranges are illustrative until verified with sources.',
+  'This is not financial or legal advice.'
+];
+
+const RATE = 0.095; // Illustrative annual rate, not a verified industry benchmark.
+const TYPICAL_DAYS = 30; // Illustrative comparison, not a universal industry standard.
+const RATE_SOURCE = 'Illustrative user-adjustable rate (not a verified benchmark)';
+
+function round2(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function validate(amount: number, days: number, rate: number): void {
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error('Invoice amount must be positive.');
+  if (!Number.isInteger(days) || days < 0 || days > 365) {
+    throw new Error('Days must be an integer between 0 and 365.');
   }
-})(/** @type {any} */ (typeof globalThis !== 'undefined' ? globalThis : typeof self !== 'undefined' ? self : this), function (/** @type {any} */ calc) {
-  // ASSUMPTION — placeholder days; replace with sourced B2B payment-survey figures.
-  const DEFAULT_BENCHMARKS = {
-    'general contracting': { low: 30, typical: 45, high: 60 },
-    'consulting':          { low: 15, typical: 30, high: 45 },
-    'manufacturing':       { low: 30, typical: 45, high: 60 },
-  };
-
-  const DISCLAIMERS = [
-    'Amount and payment-terms days are read directly from your document.',
-    'The dollar cost of float uses an assumed cost-of-capital rate (a benchmark, not your actual borrowing rate); treat it as an estimate.',
-    'Industry comparisons are typical ranges, not a recommendation of what your contract should say.',
-    'This tool is not legal or financial advice.',
-  ];
-
-  /**
-   * @typedef {Object} Confirmed
-   * @property {number} invoiceAmount
-   * @property {number} termsDays
-   * @property {number} [daysUntilPaid]
-   * @property {string|null} [discountTerms]
-   * @property {string} [industry]
-   *
-   * @typedef {Object} AnalyzeOptions
-   * @property {number} [rate]  yearly rate as a fraction, e.g. 0.095
-   * @property {Object<string, {low:number, typical:number, high:number}>} [benchmarks]
-   *
-   * @param {Confirmed} confirmed
-   * @param {AnalyzeOptions} [opts]
-   */
-  function analyze(confirmed, opts = {}) {
-    const rate = opts.rate ?? calc.DEFAULT_COST_OF_CAPITAL.rate;
-    const { invoiceAmount, termsDays } = confirmed;
-    const actualDays = confirmed.daysUntilPaid ?? termsDays;
-
-    const dollars = calc.costOfFloat(invoiceAmount, actualDays, rate);
-    const discount = calc.discountForgone(invoiceAmount, confirmed.discountTerms, actualDays);
-    const benchmark = calc.compareToBenchmark(
-      termsDays, confirmed.industry, opts.benchmarks || DEFAULT_BENCHMARKS);
-
-    return {
-      costOfFloat: {
-        kind: 'benchmark-informed estimate',
-        exactInputs: { invoiceAmount, daysUntilPaid: actualDays },
-        assumedRate: rate,
-        rateSource: calc.DEFAULT_COST_OF_CAPITAL.source,
-        estimatedCost: dollars,
-      },
-      discountForgone: discount && { kind: 'exact (from stated terms)', ...discount },
-      benchmarkComparison: benchmark && { kind: 'benchmark estimate', ...benchmark },
-      cashFlowRisk: {
-        kind: 'structural (not a dollar claim)',
-        flag: actualDays > 30,
-        note: 'Revenue that arrives late and unpredictably is a risk on its own, separate from the float cost.',
-      },
-      disclaimers: DISCLAIMERS,
-    };
+  if (!Number.isFinite(rate) || rate < 0 || rate > 1) {
+    throw new Error('Annual rate must be a decimal between 0 and 1.');
   }
+}
 
-  /**
-   * @typedef {Object} NegotiateOptions
-   * @property {number} proposedDays
-   * @property {number} [invoicesPerYear]
-   * @property {number} [rate]  yearly rate as a fraction, e.g. 0.095
-   *
-   * @param {Confirmed} confirmed
-   * @param {NegotiateOptions} options
-   */
-  function negotiate(confirmed, options) {
-    const { proposedDays, invoicesPerYear = 1, rate } = options;
-    return calc.negotiate({
-      amount: confirmed.invoiceAmount,
-      currentDays: confirmed.daysUntilPaid ?? confirmed.termsDays,
-      proposedDays,
-      invoicesPerYear,
-      rate: rate ?? calc.DEFAULT_COST_OF_CAPITAL.rate,
-    });
+function costOfFloat(amount: number, days: number, rate: number): number {
+  validate(amount, days, rate);
+  return round2(amount * (days / 365) * rate);
+}
+
+function negotiateTerms(
+  amount: number,
+  currentDays: number,
+  proposedDays: number,
+  invoicesPerYear: number,
+  rate: number
+) {
+  validate(amount, currentDays, rate);
+  validate(amount, proposedDays, rate);
+  if (!Number.isInteger(invoicesPerYear) || invoicesPerYear < 1) {
+    throw new Error('Invoices per year must be a positive integer.');
   }
+  
+  const daysSaved = currentDays - proposedDays;
+  const savingsPerInvoice = round2(amount * (daysSaved / 365) * rate);
+  const annualSavings = round2(amount * (daysSaved / 365) * rate * invoicesPerYear);
+  const annualCurrentCost = round2(amount * (currentDays / 365) * rate * invoicesPerYear);
+  // Average receivables reduced if invoices are evenly distributed over the year.
+  const workingCapitalFreed = round2(amount * invoicesPerYear * daysSaved / 365);
 
-  // ---------------------------------------------------------------------
-  // Drop-in replacements for the placeholder module (same names/signatures)
-  // ---------------------------------------------------------------------
-  const RATE = 0.095; // ASSUMPTION — matches the UI default; replace with a sourced benchmark
-  const TYPICAL_DAYS = 30; // "Net 30 is standard for most trade invoicing" (label as typical, adjustable)
-  /** @param {number} n */
-  const money = (n) => n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return { daysSaved, savingsPerInvoice, annualSavings, annualCurrentCost, workingCapitalFreed };
+}
 
-  /**
-   * @param {number} invoiceAmount
-   * @param {number} termsDays
-   * @param {string|null} [discountTerms]
-   */
-  function analyzeInvoice(invoiceAmount, termsDays, discountTerms) {
-    const estimatedCost = calc.costOfFloat(invoiceAmount, termsDays, RATE);
-    const discount = calc.discountForgone(invoiceAmount, discountTerms, termsDays);
-    return {
-      costOfFloat: { exactPart: { invoiceAmount, termsDays }, rate: RATE, estimatedCost },
-      discountForgone: discount && { exact: true, ...discount },
-      benchmarkComparison: {
-        typicalDays: TYPICAL_DAYS,
-        isAboveTypical: termsDays > TYPICAL_DAYS,
-        multiple: Math.round((termsDays / TYPICAL_DAYS) * 10) / 10,
-      },
-      cashFlowRisk: { flag: termsDays > 30, note: 'Late, unpredictable revenue is a risk separate from float cost.' },
-      disclaimers: DISCLAIMERS.join(' '),
-      disclaimerList: DISCLAIMERS,
-    };
-  }
+/** More detailed analysis; optional industry ranges are illustrations, not verified market facts. */
+export function analyze(confirmed: ConfirmedInvoice, opts: AnalyzeOptions = {}) {
+  const rate = opts.rate ?? RATE;
+  const { invoiceAmount, termsDays } = confirmed;
+  const actualDays = confirmed.daysUntilPaid ?? termsDays;
+  validate(invoiceAmount, actualDays, rate);
 
-  // freedUpCash = average cash no longer tied up in unpaid invoices (steady state).
-  /**
-   * @param {number} invoiceAmount
-   * @param {number} currentDays
-   * @param {number} proposedDays
-   * @param {number} invoicesPerYear
-   */
-  function calcNegotiationImpact(invoiceAmount, currentDays, proposedDays, invoicesPerYear) {
-    const r = calc.negotiate({
-      amount: invoiceAmount, currentDays, proposedDays, invoicesPerYear, rate: RATE,
-    });
-    return {
-      freedUpCash: r.workingCapitalFreed,
-      annualSavings: r.annualSavings,
-      savingsPerInvoice: r.savingsPerInvoice,
-      annualCurrentCost: r.annualCurrentCost,
-      daysSaved: r.daysSaved,
-    };
-  }
-
-  /**
-   * @param {string} customerName
-   * @param {number} invoiceAmount
-   * @param {number} currentDays
-   * @param {number} proposedDays
-   * @param {number} annualSavings
-   */
-  function buildLeverageLetter(customerName, invoiceAmount, currentDays, proposedDays, annualSavings) {
-    const greeting = customerName ? `Hi ${customerName} team` : 'Hi';
-    if (!(proposedDays < currentDays)) {
-      return `${greeting} — I'd like to talk about our payment terms (currently Net ${currentDays}) ahead of upcoming invoices. Do you have time to discuss?`;
-    }
-    return `${greeting} — I wanted to revisit our current payment terms (Net ${currentDays}). ` +
-      `On invoices like our recent $${money(invoiceAmount)} one, waiting ${currentDays} days instead of ${proposedDays} ` +
-      `costs us an estimated $${money(annualSavings)}/year in tied-up cash across our regular work together. ` +
-      `Moving to Net ${proposedDays} would help us plan and keep serving you reliably. Would you be open to discussing this for upcoming invoices?`;
-  }
-
-  // Accepts inv.costOfFloat as a number OR as analyzeInvoice's { estimatedCost } object.
-  /** @param {Array<{customerName: string, costOfFloat: number | {estimatedCost: number}}>} invoices */
-  function rankCustomers(invoices) {
-    /** @type {Record<string, number>} */
-    const totals = {};
-    (invoices || []).forEach((inv) => {
-      const c = inv.costOfFloat;
-      const cost = typeof c === 'number' ? c : (c && c.estimatedCost) || 0;
-      totals[inv.customerName] = (totals[inv.customerName] || 0) + cost;
-    });
-    return Object.entries(totals)
-      .map(([customerName, totalFloatCost]) => ({ customerName, totalFloatCost: calc.round2(totalFloatCost) }))
-      .sort((a, b) => b.totalFloatCost - a.totalFloatCost);
-  }
-
+  const ranges = opts.benchmarks ?? DEFAULT_BENCHMARKS;
+  const benchmark = confirmed.industry ? ranges[confirmed.industry.toLowerCase()] ?? null : null;
   return {
-    DEFAULT_BENCHMARKS, DISCLAIMERS, analyze, negotiate,
-    analyzeInvoice, calcNegotiationImpact, buildLeverageLetter, rankCustomers,
+    costOfFloat: {
+      kind: 'assumption-based estimate',
+      exactInputs: { invoiceAmount, daysUntilPaid: actualDays },
+      assumedRate: rate,
+      rateSource: RATE_SOURCE,
+      estimatedCost: costOfFloat(invoiceAmount, actualDays, rate)
+    },
+    // Offering an early-payment discount doesn't mean the vendor has lost it.
+    discountForgone: null,
+    benchmarkComparison: benchmark && {
+      kind: 'illustrative range (not a verified industry benchmark)',
+      ...benchmark,
+      isAboveTypical: termsDays > benchmark.typical
+    },
+    cashFlowRisk: {
+      kind: 'structural (not a dollar claim)',
+      flag: actualDays > 30,
+      note: 'Delayed or unpredictable payments can add cash-flow risk.'
+    },
+    disclaimers: DISCLAIMERS
   };
+}
+
+export function negotiate(confirmed: ConfirmedInvoice, options: NegotiateOptions) {
+  return negotiateTerms(
+    confirmed.invoiceAmount,
+    confirmed.daysUntilPaid ?? confirmed.termsDays,
+    options.proposedDays,
+    options.invoicesPerYear ?? 1,
+    options.rate ?? RATE
+  );
+}
+
+/** Backward-compatible response shape expected by /analyze. */
+export function analyzeInvoice(
+  invoiceAmount: number,
+  termsDays: number,
+  discountTerms: string | null = null
+) {
+  const estimatedCost = costOfFloat(invoiceAmount, termsDays, RATE);
+  return {
+    costOfFloat: {
+      exactPart: { invoiceAmount, termsDays },
+      rate: RATE,
+      estimatedCost,
+      rateSource: RATE_SOURCE
+    },
+    discountForgone: null,
+    discountTerms,
+    benchmarkComparison: {
+      typicalDays: TYPICAL_DAYS,
+      isAboveTypical: termsDays > TYPICAL_DAYS,
+      multiple: round2(termsDays / TYPICAL_DAYS),
+      kind: 'illustrative; not an established industry standard'
+    },
+    cashFlowRisk: {
+      flag: termsDays > 30,
+      note: 'Delayed, unpredictable revenue can add risk separate from financing cost.'
+    },
+    disclaimers: DISCLAIMERS.join(' '),
+    disclaimerList: DISCLAIMERS
+  };
+}
+
+/** Backward-compatible response shape expected by /negotiate. */
+export function calcNegotiationImpact(
+  invoiceAmount: number,
+  currentDays: number,
+  proposedDays: number,
+  invoicesPerYear: number
+) {
+  const result = negotiateTerms(invoiceAmount, currentDays, proposedDays, invoicesPerYear, RATE);
+  return {
+    freedUpCash: result.workingCapitalFreed,
+    annualSavings: result.annualSavings,
+    savingsPerInvoice: result.savingsPerInvoice,
+    annualCurrentCost: result.annualCurrentCost,
+    daysSaved: result.daysSaved
+  };
+}
+
+const money = (value: number): string => value.toLocaleString('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2
 });
+
+export function buildLeverageLetter(
+  customerName: string,
+  invoiceAmount: number,
+  currentDays: number,
+  proposedDays: number,
+  annualSavings: number
+): string {
+  const greeting = customerName ? `Hi ${customerName} team` : 'Hi';
+  if (proposedDays >= currentDays) {
+    return `${greeting} — I'd like to discuss our current Net ${currentDays} payment terms for future invoices.`;
+  }
+  return `${greeting} — I'd like to revisit our Net ${currentDays} payment terms. ` +
+    `On invoices similar to our recent $${money(invoiceAmount)} invoice, ` +
+    `moving to Net ${proposedDays} could reduce our modeled annual financing cost by ` +
+    `approximately $${money(annualSavings)} under our assumptions. ` +
+    `Would you be open to discussing revised terms for upcoming invoices?`;
+}
+
+export function rankCustomers(invoices: CustomerInvoice[]) {
+  const totals: Record<string, number> = {};
+  invoices.forEach((invoice) => {
+    const item = invoice.costOfFloat;
+    const cost = typeof item === 'number' ? item : item?.estimatedCost ?? 0;
+    const name = invoice.customerName || 'Unknown customer';
+    if (Number.isFinite(cost)) totals[name] = (totals[name] ?? 0) + cost;
+  });
+  return Object.entries(totals)
+    .map(([customerName, totalFloatCost]) => ({ customerName, totalFloatCost: round2(totalFloatCost) }))
+    .sort((a, b) => b.totalFloatCost - a.totalFloatCost);
+}
