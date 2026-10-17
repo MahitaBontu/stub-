@@ -1,6 +1,6 @@
 const RATE = 0.075;
 
-function analyzeInvoice(invoiceAmount, termsDays, discountTerms) {
+export function analyzeInvoice(invoiceAmount: number, termsDays: number, discountTerms: string | null) {
   const estimatedCost = Math.round(invoiceAmount * (termsDays / 365) * RATE * 100) / 100;
   return {
     costOfFloat: { exactPart: { invoiceAmount, termsDays }, rate: RATE, estimatedCost },
@@ -10,7 +10,7 @@ function analyzeInvoice(invoiceAmount, termsDays, discountTerms) {
   };
 }
 
-function calcNegotiationImpact(invoiceAmount, currentDays, proposedDays, invoicesPerYear) {
+export function calcNegotiationImpact(invoiceAmount: number, currentDays: number, proposedDays: number, invoicesPerYear: number) {
   const freedUpCash = Math.round(invoiceAmount * ((currentDays - proposedDays) / 365) * 100) / 100;
   const currentAnnual = invoiceAmount * (currentDays / 365) * RATE * invoicesPerYear;
   const proposedAnnual = invoiceAmount * (proposedDays / 365) * RATE * invoicesPerYear;
@@ -18,12 +18,19 @@ function calcNegotiationImpact(invoiceAmount, currentDays, proposedDays, invoice
   return { freedUpCash, annualSavings };
 }
 
-function buildLeverageLetter(customerName, invoiceAmount, currentDays, proposedDays, annualSavings) {
+export function buildLeverageLetter(customerName: string, invoiceAmount: number, currentDays: number, proposedDays: number, annualSavings: number) {
   return `Hi — I wanted to revisit our current payment terms (Net ${currentDays}). Moving to Net ${proposedDays} would free up roughly $${annualSavings}/year for both of us to plan around. Would you be open to discussing this for upcoming invoices?`;
 }
 
-function rankCustomers(invoices) {
-  const totals = {};
+interface ScannedInvoice {
+  customerName: string;
+  invoiceAmount: number;
+  termsDays: number;
+  costOfFloat: number;
+}
+
+export function rankCustomers(invoices: ScannedInvoice[]) {
+  const totals: Record<string, number> = {};
   invoices.forEach(inv => {
     totals[inv.customerName] = (totals[inv.customerName] || 0) + (inv.costOfFloat || 0);
   });
@@ -31,5 +38,3 @@ function rankCustomers(invoices) {
     .map(([customerName, totalFloatCost]) => ({ customerName, totalFloatCost }))
     .sort((a, b) => b.totalFloatCost - a.totalFloatCost);
 }
-
-module.exports = { analyzeInvoice, calcNegotiationImpact, buildLeverageLetter, rankCustomers };

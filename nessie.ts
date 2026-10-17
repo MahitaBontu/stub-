@@ -1,6 +1,6 @@
 const NESSIE_API_KEY = process.env.NESSIE_API_KEY;
 
-async function recordDeposit(accountId, amount) {
+export async function recordDeposit(accountId: string, amount: number) {
   if (!NESSIE_API_KEY || !accountId) {
     return { success: true, mode: 'local', amount };
   }
@@ -20,5 +20,3 @@ async function recordDeposit(accountId, amount) {
   const data = await response.json();
   return { success: true, mode: 'nessie', amount, data };
 }
-
-module.exports = { recordDeposit };
