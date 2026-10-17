@@ -19,24 +19,39 @@ interface ScannedInvoice {
 }
 let scannedInvoices: ScannedInvoice[] = [];
 
-app.post('/scan', async (req: Request, res: Response) => {
+
+app.post("/scan", async (req: Request, res: Response) => {
   try {
     const { image, mimeType, demo } = req.body;
-    if (demo === true) {
-  return res.json(getDemoData());
-}
 
-if (!image) {
-  return res.status(400).json({
-    success: false,
-    error: "Please upload an invoice."
-  });
-}
-    const result = await scanInvoice(image, mimeType || 'image/png');
-    res.json(result);
-  } catch (err: any) {
-    console.error('Scan error:', err.message);
-    res.json(getDemoData());
+    // Only return demo data when explicitly requested
+    if (demo === true) {
+      return res.json(getDemoData());
+    }
+
+    // Make sure an image was provided
+    if (!image) {
+      return res.status(400).json({
+        success: false,
+        error: "Please upload an invoice."
+      });
+    }
+
+    // Extract actual invoice data using Gemini
+    const result = await scanInvoice(
+      image,
+      mimeType || "image/png"
+    );
+
+    return res.json(result);
+
+  } catch (err: unknown) {
+    console.error("Scan error:", err);
+
+    return res.status(500).json({
+      success: false,
+      error: "Invoice extraction failed."
+    });
   }
 });
 
