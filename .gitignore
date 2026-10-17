@@ -1,2 +1,4 @@
 .env
+.env.zip
 node_modules/
+.vscode/

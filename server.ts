@@ -1,71 +1,110 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-
-const { scanInvoice, getDemoData } = require('./prompts');
-const { analyzeInvoice, calcNegotiationImpact, buildLeverageLetter, rankCustomers } = require('./findings');
-const { recordDeposit } = require('./nessie');
+import 'dotenv/config';
+import express, { type Request, type Response } from 'express';
+// The existing project already uses cors; no new type package is required.
+const cors: () => import('express').RequestHandler = require('cors');
+import { getDemoData, scanInvoice } from './prompts';
+import { analyzeInvoice, calcNegotiationImpact, buildLeverageLetter, rankCustomers, type CustomerInvoice } from './findings';
 
 const app = express();
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '12mb' }));
 app.use(express.static('public'));
 
-// in-memory session storage for scanned invoices (no database needed for the demo)
-let scannedInvoices = [];
+// Hackathon-only, process-local records. Do not use this with real private invoices.
+const scannedInvoices: CustomerInvoice[] = [];
 
-app.post('/scan', async (req, res) => {
+function errorMessage(err: unknown): string {
+  return err instanceof Error ? err.message : 'Unexpected error';
+}
+function numeric(value: unknown, label: string): number {
+  const result = typeof value === 'number' ? value :
+    (typeof value === 'string' && value.trim() !== '' ? Number(value) : NaN);
+  if (!Number.isFinite(result)) throw new Error(`${label} is required and must be numeric.`);
+  return result;
+}
+function optionalRate(value: unknown): number | undefined {
+  return value === undefined || value === null || value === '' ? undefined : numeric(value, 'Annual rate');
+}
+function bodyObject(req: Request): Record<string, unknown> {
+  if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+    throw new Error('A JSON object is required.');
+  }
+  return req.body as Record<string, unknown>;
+}
+function handleBadRequest(res: Response, err: unknown) {
+  res.status(400).json({ success: false, error: errorMessage(err) });
+}
+
+app.post('/scan', async (req: Request, res: Response) => {
   try {
-    const { image, mimeType, demo } = req.body;
-    if (demo || !image) return res.json(getDemoData());
-    const result = await scanInvoice(image, mimeType || 'image/png');
-    res.json(result);
+    const body = bodyObject(req);
+    if (body.demo === true) return res.json(getDemoData());
+    const image = body.image ?? body.imageBase64;
+    if (typeof image !== 'string' || !image) {
+      return res.status(400).json({ success: false, error: 'Provide base64 image data, or set demo: true.' });
+    }
+    const mimeType = typeof body.mimeType === 'string' ? body.mimeType : 'image/png';
+    return res.json(await scanInvoice(image, mimeType));
   } catch (err) {
-    console.error('Scan error:', err.message);
-    res.json(getDemoData());
+    // Never masquerade as a successful extraction if Gemini fails.
+    console.error('Invoice scan failed:', errorMessage(err));
+    return res.status(502).json({ success: false, error: 'Invoice extraction failed. Check your key, input file, and model, then retry.' });
   }
 });
 
-app.post('/analyze', (req, res) => {
+app.post('/analyze', (req: Request, res: Response) => {
   try {
-    const { invoiceAmount, termsDays, discountTerms, customerName } = req.body;
-    const result = analyzeInvoice(Number(invoiceAmount), Number(termsDays), discountTerms);
-    scannedInvoices.push({ customerName, invoiceAmount, termsDays, costOfFloat: result.costOfFloat.estimatedCost });
-    res.json({ success: true, ...result });
+    const body = bodyObject(req);
+    const invoiceAmount = numeric(body.invoiceAmount, 'Invoice amount');
+    const termsDays = numeric(body.termsDays, 'Payment term');
+    const discountTerms = typeof body.discountTerms === 'string' ? body.discountTerms : null;
+    const result = analyzeInvoice(invoiceAmount, termsDays, discountTerms, optionalRate(body.annualRate));
+    scannedInvoices.push({
+      customerName: typeof body.customerName === 'string' ? body.customerName : 'Unknown customer',
+      costOfFloat: result.costOfFloat.estimatedCost
+    });
+    return res.json({ success: true, ...result });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    return handleBadRequest(res, err);
   }
 });
 
-app.post('/negotiate', (req, res) => {
+app.post('/negotiate', (req: Request, res: Response) => {
   try {
-    const { invoiceAmount, currentDays, proposedDays, invoicesPerYear } = req.body;
-    const result = calcNegotiationImpact(Number(invoiceAmount), Number(currentDays), Number(proposedDays), Number(invoicesPerYear) || 12);
-    res.json({ success: true, ...result });
+    const body = bodyObject(req);
+    const result = calcNegotiationImpact(
+      numeric(body.invoiceAmount, 'Invoice amount'),
+      numeric(body.currentDays, 'Current payment term'),
+      numeric(body.proposedDays, 'Proposed payment term'),
+      body.invoicesPerYear === undefined ? 1 : numeric(body.invoicesPerYear, 'Invoices per year'),
+      optionalRate(body.annualRate)
+    );
+    return res.json({ success: true, ...result });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    return handleBadRequest(res, err);
   }
 });
 
-app.post('/letter', (req, res) => {
+app.post('/letter', (req: Request, res: Response) => {
   try {
-    const { customerName, invoiceAmount, currentDays, proposedDays, annualSavings } = req.body;
-    const letterText = buildLeverageLetter(customerName, invoiceAmount, currentDays, proposedDays, annualSavings);
-    res.json({ success: true, letterText });
+    const body = bodyObject(req);
+    const letterText = buildLeverageLetter(
+      typeof body.customerName === 'string' ? body.customerName : '',
+      numeric(body.invoiceAmount, 'Invoice amount'),
+      numeric(body.currentDays, 'Current payment term'),
+      numeric(body.proposedDays, 'Proposed payment term'),
+      numeric(body.annualSavings, 'Annual savings estimate')
+    );
+    return res.json({ success: true, letterText });
   } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
+    return handleBadRequest(res, err);
   }
 });
 
-app.post('/rank', (req, res) => {
-  try {
-    res.json({ success: true, ranking: rankCustomers(scannedInvoices) });
-  } catch (err) {
-    res.status(400).json({ success: false, error: err.message });
-  }
+app.post('/rank', (_req: Request, res: Response) => {
+  return res.json({ success: true, ranking: rankCustomers(scannedInvoices) });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT || 3000);
 app.listen(PORT, () => console.log(`Stub running on http://localhost:${PORT}`));
-
-module.exports = app;
+export default app;

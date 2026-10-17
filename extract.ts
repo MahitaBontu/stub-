@@ -86,15 +86,19 @@ export async function extractInvoice(
     throw new Error("Unsupported document type");
   }
 
-  if (!imageBase64) {
-    throw new Error("No document provided");
+  // Gemini inline uploads have size limits; cap demo uploads at 8 MiB.
+  if (!imageBase64 || !/^[A-Za-z0-9+/]+={0,2}$/.test(imageBase64)) {
+    throw new Error("Expected valid base64 document data");
+  }
+  if (Buffer.byteLength(imageBase64, "base64") > 8 * 1024 * 1024) {
+    throw new Error("Document is too large (8 MiB maximum)");
   }
 
   // Initialize Gemini
   const ai = new GoogleGenAI({ apiKey });
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: process.env.GEMINI_MODEL || "gemini-3.8-flash",
 
     contents: [
       {
