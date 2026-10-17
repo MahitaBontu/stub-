@@ -25,6 +25,7 @@ export function getDemoData() {
 }
 
 
+
 export async function scanInvoice(
   image: string,
   mimeType: string
