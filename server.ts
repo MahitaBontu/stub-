@@ -22,7 +22,16 @@ let scannedInvoices: ScannedInvoice[] = [];
 app.post('/scan', async (req: Request, res: Response) => {
   try {
     const { image, mimeType, demo } = req.body;
-    if (demo || !image) return res.json(getDemoData());
+    if (demo === true) {
+  return res.json(getDemoData());
+}
+
+if (!image) {
+  return res.status(400).json({
+    success: false,
+    error: "Please upload an invoice."
+  });
+}
     const result = await scanInvoice(image, mimeType || 'image/png');
     res.json(result);
   } catch (err: any) {
