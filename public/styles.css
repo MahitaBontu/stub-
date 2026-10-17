@@ -3129,3 +3129,13 @@ input[type="range"]:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+.rate-field {
+  max-width: 260px;
+  margin-top: 18px;
+}
+
+.rate-field .input-wrap input {
+  min-height: 44px;
+  font-size: 15px;
+}

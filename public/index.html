@@ -363,10 +363,19 @@
               <span class="card-kicker">Cost of float</span>
             </div>
             <p class="number-display" id="estimate-amount">$936.99</p>
-            <p class="card-copy" id="estimate-copy">Cost of float is what the wait costs you. At the <strong>9.5%</strong> national average cost of capital — a standard estimate of what cash could earn — 75 days of delay comes to this estimate.</p>
+            <p class="card-copy" id="estimate-copy">Cost of float is what the wait costs you. At the <strong class="rate-text">9.5%</strong> national average cost of capital — a standard estimate of what cash could earn — 75 days of delay comes to this estimate.</p>
             <div class="estimate-meta">
               <span id="benchmark-comparison">2.5× typical Net 30 terms</span>
               <span id="estimate-days">75-day float</span>
+            </div>
+            <div class="field rate-field" data-field="rate">
+              <label for="rate-input">Assumed cost of capital</label>
+              <div class="input-wrap input-wrap-suffix">
+                <input id="rate-input" class="rate-input" type="number" inputmode="decimal" min="0" max="100" step="0.1" value="9.5" aria-describedby="rate-helper rate-error">
+                <span class="input-suffix" aria-hidden="true">% / yr</span>
+              </div>
+              <p class="field-helper" id="rate-helper">Change this to your own rate. 9.5% is the starting default.</p>
+              <p class="field-error" id="rate-error" hidden></p>
             </div>
             <p class="card-footnote">A national average, not your actual rate — and not a guaranteed saving.</p>
           </article>
@@ -426,16 +435,17 @@
               <svg class="od-icon terms-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
               <div class="terms-side terms-side-proposed">
                 <span>Proposed terms</span>
-                <strong id="proposed-terms-label">Net 30</strong>
+                <strong id="proposed-terms-label">Net 75</strong>
               </div>
             </div>
 
             <div class="slider-block">
               <label for="terms-slider">Proposed payment terms in days</label>
-              <input id="terms-slider" type="range" min="10" max="75" step="1" value="30">
+              <input id="terms-slider" type="range" min="10" max="75" step="1" value="75">
               <div class="range-labels" id="range-labels">
                 <span>Net 10</span>
                 <span>Net 30</span>
+                <span>Net 55</span>
                 <span>Net 75</span>
               </div>
             </div>
@@ -460,7 +470,7 @@
 
         <details class="method-note">
           <summary>How these numbers are calculated</summary>
-          <p>In plain terms: the sooner the customer pays, the less time your cash is tied up. Cash freed up = invoice amount × days sooner ÷ 365. Annual value = the yearly difference in estimated cost of float across 12 invoices. The 9.5% rate is a national benchmark — an estimate of what cash could earn — not your actual cost of capital.</p>
+          <p>In plain terms: the sooner the customer pays, the less time your cash is tied up. Cash freed up = invoice amount × days sooner ÷ 365. Annual value = the yearly difference in estimated cost of float across 12 invoices. The <span class="rate-text">9.5%</span> rate is a national benchmark — an estimate of what cash could earn — not your actual cost of capital.</p>
         </details>
 
         <div class="negotiation-actions">
@@ -527,7 +537,7 @@
             <h1 id="ranking-title">Who’s using your cash?</h1>
             <p class="lede">Grouped across every invoice in this session. This is the cross-customer view a single invoice can’t show you.</p>
           </div>
-          <span class="invoice-context">Estimated at 9.5%</span>
+          <span class="invoice-context" id="rate-pill">Estimated at 9.5%</span>
         </div>
 
         <div class="ranking-summary" id="ranking-summary">
@@ -559,7 +569,7 @@
           </div>
         </div>
 
-        <p class="ranking-note">Ranked by estimated cost of float — what each customer’s delays cost at a 9.5% benchmark, not by invoice size alone. The cash tied up is exact; this ranking is an estimate.</p>
+        <p class="ranking-note">Ranked by estimated cost of float — what each customer’s delays cost at a <span class="rate-text">9.5%</span> benchmark, not by invoice size alone. The cash tied up is exact; this ranking is an estimate.</p>
 
         <div class="result-actions">
           <button class="button button-secondary" type="button" data-action="choose-scan">Scan another invoice</button>
@@ -602,6 +612,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+  <script src="calculations.js" defer></script>
   <script src="app.js" defer></script>
 </body>
 </html>
