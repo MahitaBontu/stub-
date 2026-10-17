@@ -9,6 +9,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["*.ts"],
+  "include": ["*.ts", "backend/server.ts"],
   "exclude": ["node_modules", "public"]
 }

@@ -3,6 +3,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 
 import { scanInvoice, getDemoData } from './prompts';
+import { retrieveRelevantInvoices } from './backend/calculations/retrieve';
 import { analyzeInvoice, calcNegotiationImpact, buildLeverageLetter, rankCustomers } from './findings';
 import { recordDeposit } from './nessie';
 
@@ -16,6 +17,7 @@ interface ScannedInvoice {
   invoiceAmount: number;
   termsDays: number;
   costOfFloat: number;
+  industry?: string;
 }
 let scannedInvoices: ScannedInvoice[] = [];
 
@@ -59,7 +61,7 @@ app.post('/analyze', (req: Request, res: Response) => {
   try {
     const { invoiceAmount, termsDays, discountTerms, customerName } = req.body;
     const result = analyzeInvoice(Number(invoiceAmount), Number(termsDays), discountTerms);
-    scannedInvoices.push({ customerName, invoiceAmount, termsDays, costOfFloat: result.costOfFloat.estimatedCost });
+    scannedInvoices.push({ customerName, invoiceAmount, termsDays, costOfFloat: result.costOfFloat.estimatedCost, industry: req.body.industry });
     res.json({ success: true, ...result });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
@@ -68,9 +70,12 @@ app.post('/analyze', (req: Request, res: Response) => {
 
 app.post('/negotiate', (req: Request, res: Response) => {
   try {
-    const { invoiceAmount, currentDays, proposedDays, invoicesPerYear } = req.body;
+    const { invoiceAmount, currentDays, proposedDays, invoicesPerYear, customerName, industry } = req.body;
     const result = calcNegotiationImpact(Number(invoiceAmount), Number(currentDays), Number(proposedDays), Number(invoicesPerYear) || 12);
-    res.json({ success: true, ...result });
+
+    const context = retrieveRelevantInvoices(scannedInvoices, customerName || '', industry);
+
+    res.json({ success: true, ...result, retrievedContext: context.summary, historyCount: context.matchedInvoices.length });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
   }
@@ -78,9 +83,15 @@ app.post('/negotiate', (req: Request, res: Response) => {
 
 app.post('/letter', (req: Request, res: Response) => {
   try {
-    const { customerName, invoiceAmount, currentDays, proposedDays, annualSavings } = req.body;
-    const letterText = buildLeverageLetter(customerName, invoiceAmount, currentDays, proposedDays, annualSavings);
-    res.json({ success: true, letterText });
+    const { customerName, invoiceAmount, currentDays, proposedDays, annualSavings, industry } = req.body;
+    const context = retrieveRelevantInvoices(scannedInvoices, customerName, industry);
+    let letterText = buildLeverageLetter(customerName, invoiceAmount, currentDays, proposedDays, annualSavings);
+
+    if (context.matchedInvoices.length > 0) {
+      letterText += `\n\n(Based on this relationship's history: ${context.summary})`;
+    }
+
+    res.json({ success: true, letterText, retrievedContext: context.summary });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
   }

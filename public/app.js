@@ -837,26 +837,42 @@ function updateNegotiation() {
     els.draftLetterButton.disabled = !hasImpact;
     els.draftLetterButton.setAttribute("aria-disabled", String(!hasImpact));
 }
+function retrieveCustomerHistory(customerName) {
+  const priorInvoices = (state.session || []).filter(
+    (inv) => inv.customer === customerName && inv.id !== state.current?.id
+  );
+  if (priorInvoices.length === 0) return null;
+
+  const avgTerms = Math.round(
+    priorInvoices.reduce((sum, inv) => sum + inv.termsDays, 0) / priorInvoices.length
+  );
+  const totalAmount = priorInvoices.reduce((sum, inv) => sum + inv.amount, 0);
+
+  return `${priorInvoices.length} prior invoice${priorInvoices.length === 1 ? "" : "s"} on file for ${customerName} (${formatMoney(totalAmount)} total), averaging Net ${avgTerms} terms.`;
+}
+
 function buildLeverageLetter() {
-    const invoice = state.current;
-    if (!invoice)
-        return "";
-    const proposed = state.proposedDays;
-    const costOfFloat = calcCostOfFloat(invoice.amount, invoice.termsDays);
-    const savingsPerInvoice = calcSavingsPerInvoice(invoice.amount, invoice.termsDays, proposed);
-    const annualSavings = calcAnnualSavings(invoice.amount, invoice.termsDays, proposed);
-    const daysSaved = Math.max(0, invoice.termsDays - proposed);
-    return `Hi ${invoice.customer} team,
+  const invoice = state.current;
+  if (!invoice) return "";
 
-I wanted to raise something practical about our payment terms. Our current Net ${invoice.termsDays} arrangement keeps ${formatMoney(invoice.amount)} unpaid for ${invoice.termsDays} days after each invoice. Using an assumed 9.5% annual financing rate, the estimated cost of waiting is ${formatMoney(costOfFloat)} per invoice.
+  const proposed = state.proposedDays;
+  const costOfFloat = calcCostOfFloat(invoice.amount, invoice.termsDays);
+  const freedCash = calcFreedCash(invoice.amount, invoice.termsDays, proposed);
+  const annualSavings = calcAnnualSavings(invoice.amount, invoice.termsDays, proposed);
+  const history = retrieveCustomerHistory(invoice.customer);
 
-We value working with you, and moving to Net ${proposed} would let us receive ${formatMoney(invoice.amount)} ${daysSaved} days sooner. Based on that same financing-rate assumption, it could avoid about ${formatMoney(savingsPerInvoice)} in financing costs per invoice. Across ${INVOICES_PER_YEAR} similar invoices per year, that could total approximately ${formatMoney(annualSavings)} in avoided financing costs.
+  return `Hi ${invoice.customer} team,
+
+I wanted to raise something practical about our payment terms. Our current Net ${invoice.termsDays} arrangement keeps ${formatMoney(invoice.amount)} tied up for ${invoice.termsDays} days after each invoice. At a 9.5% annual cost of capital — a standard estimate of what that cash could earn elsewhere — the delay costs us about ${formatMoney(costOfFloat)} per invoice.
+
+We value working with you, and I think there is a straightforward improvement for both of us: moving to Net ${proposed} would free about ${formatMoney(freedCash)} in cash per invoice cycle. Across ${INVOICES_PER_YEAR} invoices a year, that is roughly ${formatMoney(annualSavings)} back into the business.
 
 Would you be open to updating our terms to Net ${proposed} for future invoices? Happy to talk through what works on your side.
 
 Thanks,
-[Your name]`;
+[Your name]${history ? `\n\n(Context: ${history})` : ""}`;
 }
+
 function openLetter() {
     if (!state.current)
         return;
