@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Stub — See the cost of late payment</title>
+  <meta name="description" content="Stub turns one unpaid invoice into a clear estimate of what late payment costs — and a plain-English terms conversation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <symbol id="i-arrow-right" viewBox="0 0 24 24">
+      <path d="M5 12h14M13 6l6 6-6 6"/>
+    </symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24">
+      <path d="M19 12H5M11 18l-6-6 6-6"/>
+    </symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24">
+      <path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>
+    </symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24">
+      <rect x="4" y="10" width="16" height="11" rx="2"/>
+      <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+    </symbol>
+    <symbol id="i-file" viewBox="0 0 24 24">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <path d="M14 2v6h6M8 13h8M8 17h5"/>
+    </symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v5l3 2"/>
+    </symbol>
+    <symbol id="i-message" viewBox="0 0 24 24">
+      <path d="M4 5h16v12H8l-4 4z"/>
+      <path d="M8 9h8M8 13h5"/>
+    </symbol>
+    <symbol id="i-ranking" viewBox="0 0 24 24">
+      <path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/>
+    </symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24">
+      <rect x="9" y="9" width="11" height="11" rx="2"/>
+      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>
+    </symbol>
+    <symbol id="i-check" viewBox="0 0 24 24">
+      <path d="M20 6 9 17l-5-5"/>
+    </symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7.5v5M12 16.5h.01"/>
+    </symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24">
+      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/>
+    </symbol>
+  </svg>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <button class="brand" type="button" data-action="home" aria-label="Stub home">stub<span aria-hidden="true">.</span></button>
+      <div class="header-actions">
+        <span class="session-pill" id="session-pill" hidden>0 invoices</span>
+        <button class="header-button" type="button" id="restart-button" data-action="restart" hidden>Start over</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flowbar" id="flowbar" hidden>
+    <div class="flowbar-inner">
+      <span class="flow-kicker" id="flow-kicker">Invoice flow</span>
+      <ol class="stepper" aria-label="Invoice flow progress">
+        <li class="step" data-step="0" aria-label="Step 1: Scan"><span class="step-index">1</span><span class="step-label">Scan</span></li>
+        <li class="step" data-step="1" aria-label="Step 2: Review"><span class="step-index">2</span><span class="step-label">Review</span></li>
+        <li class="step" data-step="2" aria-label="Step 3: Float"><span class="step-index">3</span><span class="step-label">Float</span></li>
+        <li class="step" data-step="3" aria-label="Step 4: Negotiate"><span class="step-index">4</span><span class="step-label">Negotiate</span></li>
+        <li class="step" data-step="4" aria-label="Step 5: Letter"><span class="step-index">5</span><span class="step-label">Letter</span></li>
+      </ol>
+      <span class="flow-session" id="flow-session"></span>
+    </div>
+  </div>
+
+  <main id="main">
+    <section class="screen landing is-active" id="screen-landing" aria-labelledby="landing-title">
+      <div class="landing-inner">
+        <div class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>The cost of waiting, made visible</p>
+            <h1 id="landing-title">Late payment has a price. <em>Now you can see it.</em></h1>
+            <p class="hero-lede">Stub reads one invoice and puts a number on the wait. The cost of float is simply what it costs you to have your cash tied up for those extra days — and it is a number you can use in the next terms conversation.</p>
+            <div class="hero-actions">
+              <button class="button button-primary" type="button" data-action="choose-scan">
+                Scan an invoice
+                <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </button>
+              <button class="button button-secondary" type="button" data-action="demo">See it with demo data</button>
+            </div>
+            <p class="privacy-line">
+              <svg class="od-icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+              Files stay in this browser session. No bank connection. No payment chasing.
+            </p>
+          </div>
+
+          <div class="hero-proof" aria-label="Example invoice and estimated cost of float">
+            <div class="proof-topline">
+              <span class="proof-tag">Example · INV-2048</span>
+              <span class="proof-terms"><span class="proof-dot" aria-hidden="true"></span>Net 75</span>
+            </div>
+            <div class="invoice-paper">
+              <div class="invoice-head">
+                <div class="invoice-identity">
+                  <span class="invoice-from">Your business</span>
+                  <span class="invoice-to">Invoice to Ridgeline Fabrication</span>
+                </div>
+                <span class="invoice-days">75<small>days</small></span>
+              </div>
+              <div class="invoice-rule"></div>
+              <div class="invoice-line"><span>Design retainer</span><span>$32,000.00</span></div>
+              <div class="invoice-line"><span>Production setup</span><span>$16,000.00</span></div>
+              <div class="invoice-total"><span>Amount due</span><strong>$48,000.00</strong></div>
+              <div class="invoice-dates"><span>Issued Aug 14</span><span>Due Oct 28</span></div>
+            </div>
+            <div class="proof-result">
+              <div>
+                <span class="proof-label">Estimated cost of float</span>
+                <strong class="proof-number">$936.99</strong>
+                <span class="proof-note">what 75 days of waiting costs at a 9.5% yearly rate</span>
+              </div>
+              <div class="proof-clock">
+                <span class="proof-live"><span class="pulse-dot" aria-hidden="true"></span>Live clock</span>
+                <strong class="proof-rate">$0.000145<small>/sec</small></strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="feature-band" aria-label="What Stub does">
+          <article class="feature">
+            <span class="feature-index">01</span>
+            <div>
+              <h2>Float Clock</h2>
+              <p>A running total of what the wait costs, updated every second — not a surprise at the end of a spreadsheet.</p>
+            </div>
+          </article>
+          <article class="feature">
+            <span class="feature-index">02</span>
+            <div>
+              <h2>Terms letter</h2>
+              <p>Turns the difference into a short, plain-English message you can copy and send.</p>
+            </div>
+          </article>
+          <article class="feature">
+            <span class="feature-index">03</span>
+            <div>
+              <h2>Customer ranking</h2>
+              <p>Scan more than one invoice and see which customers keep your cash the longest.</p>
+            </div>
+          </article>
+        </div>
+
+        <p class="landing-footnote">A prototype for small businesses. Not accounting, legal, or financial advice.</p>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-scan" aria-labelledby="scan-title" hidden>
+      <div class="app-inner">
+        <button class="back-link" type="button" data-action="back-landing">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back
+        </button>
+        <div class="screen-heading">
+          <p class="eyebrow">Step 1 · Invoice intake</p>
+          <h1 id="scan-title">Start with one invoice.</h1>
+          <p class="lede">Upload an image or PDF. Stub pulls out the amount, payment terms, due date, and customer — then you confirm every field before any math runs.</p>
+        </div>
+
+        <div class="scan-layout">
+          <div class="panel scan-panel">
+            <div id="scan-idle">
+              <label class="dropzone" id="dropzone" for="invoice-file" tabindex="0">
+                <input class="sr-only" id="invoice-file" type="file" accept="image/*,.pdf" tabindex="-1" aria-describedby="file-hint">
+                <span class="drop-icon" aria-hidden="true">
+                  <svg class="od-icon od-icon-lg" aria-hidden="true"><use href="#i-upload"></use></svg>
+                </span>
+                <span class="drop-title">Drop an invoice here</span>
+                <span class="drop-copy" id="file-hint">JPG, PNG, WebP, or PDF · up to 10 MB</span>
+                <span class="drop-button">Choose a file</span>
+              </label>
+              <div class="demo-row">
+                <span>No invoice handy?</span>
+                <button class="text-link" type="button" data-action="demo">Use the demo invoice</button>
+              </div>
+              <p class="quiet-note">
+                <svg class="od-icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+                Nothing is sent to a bank or to your customers.
+              </p>
+            </div>
+
+            <div class="scan-loading" id="scan-loading" aria-live="polite" hidden>
+              <div class="spinner" aria-hidden="true"></div>
+              <h2>Reading your invoice</h2>
+              <p class="scan-file-label" id="scan-file-label">Pulling out the amount, terms, and dates…</p>
+              <ol class="scan-steps">
+                <li id="scan-step-0"><span class="scan-step-mark" aria-hidden="true"></span>Reading the invoice</li>
+                <li id="scan-step-1"><span class="scan-step-mark" aria-hidden="true"></span>Matching payment terms</li>
+                <li id="scan-step-2"><span class="scan-step-mark" aria-hidden="true"></span>Preparing your review</li>
+              </ol>
+            </div>
+          </div>
+
+          <aside class="scan-aside">
+            <p class="eyebrow">What Stub looks for</p>
+            <ul class="check-list">
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Invoice amount</strong><small>The cash that is tied up.</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Payment terms</strong><small>Net 30, 30 days, or a specific due date.</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Customer name</strong><small>So you can compare across invoices.</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Discount clause</strong><small>Optional. Flagged for review if missing.</small></span></li>
+            </ul>
+            <div class="aside-note">
+              <svg class="od-icon" aria-hidden="true"><use href="#i-alert"></use></svg>
+              <p>The read is only a starting point. You confirm every field on the next screen.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-review" aria-labelledby="review-title" hidden>
+      <div class="app-inner">
+        <button class="back-link" type="button" data-action="back-scan">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back to scan
+        </button>
+        <div class="screen-heading review-heading">
+          <p class="eyebrow">Step 2 · Confirm the facts</p>
+          <h1 id="review-title">Check what we found.</h1>
+          <p class="lede">Correct anything that looks off. The math uses only the fields you confirm here.</p>
+        </div>
+
+        <div class="review-layout">
+          <form class="panel review-form" id="review-form" novalidate>
+            <div class="form-error" id="form-error" role="alert" hidden></div>
+            <p class="review-source-note" id="review-source-note"></p>
+
+            <div class="form-grid">
+              <div class="field" data-field="customer">
+                <label for="field-customer">Customer <span class="required-mark" aria-hidden="true">*</span> <span class="field-flag" id="flag-customer" hidden>Check this</span></label>
+                <input id="field-customer" name="customer" type="text" autocomplete="organization" maxlength="80" required aria-describedby="helper-customer error-customer">
+                <p class="field-helper" id="helper-customer">Who is this invoice from?</p>
+                <p class="field-error" id="error-customer" hidden></p>
+              </div>
+
+              <div class="field" data-field="amount">
+                <label for="field-amount">Invoice amount <span class="required-mark" aria-hidden="true">*</span></label>
+                <div class="input-wrap">
+                  <span class="input-prefix" aria-hidden="true">$</span>
+                  <input id="field-amount" name="amount" type="number" inputmode="decimal" min="0.01" step="0.01" required aria-describedby="helper-amount error-amount">
+                </div>
+                <p class="field-helper" id="helper-amount">The full amount due on this invoice.</p>
+                <p class="field-error" id="error-amount" hidden></p>
+              </div>
+
+              <div class="field" data-field="termsDays">
+                <label for="field-terms">Payment terms <span class="required-mark" aria-hidden="true">*</span></label>
+                <div class="input-wrap input-wrap-suffix">
+                  <input id="field-terms" name="termsDays" type="number" inputmode="numeric" min="1" max="365" step="1" required aria-describedby="helper-terms error-terms">
+                  <span class="input-suffix" aria-hidden="true">days</span>
+                </div>
+                <p class="field-helper" id="helper-terms">“Net 30” becomes 30. “Due within 45 days” becomes 45.</p>
+                <p class="field-error" id="error-terms" hidden></p>
+              </div>
+
+              <div class="field" data-field="dueDate">
+                <label for="field-due-date">Due date <span class="required-mark" aria-hidden="true">*</span></label>
+                <input id="field-due-date" name="dueDate" type="date" required aria-describedby="helper-due error-due">
+                <p class="field-helper" id="helper-due">Used to show the invoice timeline.</p>
+                <p class="field-error" id="error-due" hidden></p>
+              </div>
+
+              <div class="field field-full" data-field="discountTerms">
+                <label for="field-discount">Early-payment discount <span class="optional-mark">Optional</span> <span class="field-flag" id="flag-discount" hidden>Not detected</span></label>
+                <input id="field-discount" name="discountTerms" type="text" maxlength="60" placeholder="e.g. 2/10 Net 30" aria-describedby="helper-discount error-discount">
+                <p class="field-helper" id="helper-discount">Leave blank if the invoice has no discount clause. Stub will never guess one.</p>
+                <p class="field-error" id="error-discount" hidden></p>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="button button-primary" type="submit">
+                See what the wait costs
+                <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              </button>
+              <span class="form-actions-note">Editable before and after the math.</span>
+            </div>
+          </form>
+
+          <aside class="review-aside">
+            <div class="snapshot">
+              <div class="snapshot-topline">
+                <span class="eyebrow">Invoice snapshot</span>
+                <span class="mini-pill" id="review-source-label">Demo invoice</span>
+              </div>
+              <div class="snapshot-amount" id="snapshot-amount">$48,000.00</div>
+              <div class="snapshot-row"><span>Customer</span><strong id="snapshot-customer">Ridgeline Fabrication</strong></div>
+              <div class="snapshot-row"><span>Terms</span><strong id="snapshot-terms">Net 75</strong></div>
+              <div class="snapshot-row"><span>Due</span><strong id="snapshot-due">Oct 28, 2026</strong></div>
+              <div class="snapshot-row"><span>Discount</span><strong id="snapshot-discount">None</strong></div>
+            </div>
+
+            <div class="review-explainer">
+              <p class="eyebrow">What happens next</p>
+              <ol class="numbered-list">
+                <li><span>01</span><p>What you are owed is exact. What the wait costs is an estimate.</p></li>
+                <li><span>02</span><p>The Float Clock shows that estimate adding up in real time.</p></li>
+                <li><span>03</span><p>Move the terms and draft a message.</p></li>
+              </ol>
+            </div>
+
+            <div class="aside-note quiet">
+              <svg class="od-icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+              <p>This prototype keeps everything in your browser session. There is no database.</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-results" aria-labelledby="results-title" hidden>
+      <div class="app-inner">
+        <button class="back-link" type="button" data-action="back-review">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back to review
+        </button>
+        <div class="results-heading">
+          <div>
+            <p class="eyebrow">Step 3 · The numbers</p>
+            <h1 id="results-title">Two numbers, kept separate.</h1>
+            <p class="lede">What you are owed is exact. What the wait costs is an estimate, based on a national benchmark rate rather than your own cost of capital. Stub keeps them apart so you always know which is which.</p>
+          </div>
+          <span class="invoice-context" id="invoice-context">INV-2048 · Ridgeline Fabrication</span>
+        </div>
+
+        <div class="result-grid">
+          <article class="number-card number-card-exact">
+            <div class="card-topline">
+              <span class="pill pill-exact">Exact</span>
+              <span class="card-kicker">Cash tied up</span>
+            </div>
+            <p class="number-display" id="exact-amount">$48,000.00</p>
+            <p class="card-copy" id="exact-copy">$48,000.00 is tied up with Ridgeline Fabrication for 75 days after each invoice.</p>
+            <div class="timeline" aria-hidden="true">
+              <div class="timeline-track"><span class="timeline-fill"></span></div>
+              <div class="timeline-labels"><span id="timeline-issued">Issued Aug 14</span><span id="timeline-due">Due Oct 28</span></div>
+            </div>
+            <p class="card-footnote" id="exact-footnote">Principal due Oct 28, 2026. This is not an estimate.</p>
+          </article>
+
+          <article class="number-card number-card-estimate">
+            <div class="card-topline">
+              <span class="pill pill-estimate">Estimate</span>
+              <span class="card-kicker">Cost of float</span>
+            </div>
+            <p class="number-display" id="estimate-amount">$936.99</p>
+            <p class="card-copy" id="estimate-copy">Cost of float is what the wait costs you. At the <strong>9.5%</strong> national average cost of capital — a standard estimate of what cash could earn — 75 days of delay comes to this estimate.</p>
+            <div class="estimate-meta">
+              <span id="benchmark-comparison">2.5× typical Net 30 terms</span>
+              <span id="estimate-days">75-day float</span>
+            </div>
+            <p class="card-footnote">A national average, not your actual rate — and not a guaranteed saving.</p>
+          </article>
+        </div>
+
+        <section class="clock-card" aria-labelledby="clock-title">
+          <div class="clock-topline">
+            <span class="clock-live"><span class="pulse-dot" aria-hidden="true"></span>Float Clock · live</span>
+            <span class="clock-since">Timer starts from zero on this screen</span>
+          </div>
+          <div class="clock-main">
+            <div class="clock-copy">
+              <h2 id="clock-title">Every second has a price.</h2>
+              <p>This is what the wait costs, adding up second by second — the number that is easy to feel and hard to put in a spreadsheet.</p>
+            </div>
+            <div class="clock-readout">
+              <span class="clock-value" id="clock-value" aria-label="Cost of float accumulating">$0.000000</span>
+              <span class="clock-rate" id="clock-rate">≈ $0.52 per hour</span>
+            </div>
+          </div>
+          <div class="clock-footer">
+            <span>Full-term estimate <strong id="clock-total">$936.99</strong></span>
+            <span>The clock is illustrative, not a bank ledger.</span>
+          </div>
+        </section>
+
+        <div class="result-actions">
+          <button class="button button-primary" type="button" data-action="open-negotiation">
+            Negotiate the terms
+            <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+          <button class="button button-secondary" type="button" data-action="open-ranking">See customer ranking</button>
+          <button class="text-link" type="button" data-action="choose-scan">Scan another invoice</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-negotiation" aria-labelledby="negotiation-title" hidden>
+      <div class="app-inner">
+        <button class="back-link" type="button" data-action="back-results">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back to the numbers
+        </button>
+        <div class="screen-heading">
+          <p class="eyebrow">Step 4 · Negotiate</p>
+          <h1 id="negotiation-title">Change one number.</h1>
+          <p class="lede">Move the proposed terms and watch two outcomes update instantly: cash freed up on this invoice, and what that change is worth over a year.</p>
+        </div>
+
+        <div class="negotiation-layout">
+          <div class="panel slider-panel">
+            <div class="terms-compare">
+              <div class="terms-side">
+                <span>Current terms</span>
+                <strong id="current-terms-label">Net 75</strong>
+              </div>
+              <svg class="od-icon terms-arrow" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+              <div class="terms-side terms-side-proposed">
+                <span>Proposed terms</span>
+                <strong id="proposed-terms-label">Net 30</strong>
+              </div>
+            </div>
+
+            <div class="slider-block">
+              <label for="terms-slider">Proposed payment terms in days</label>
+              <input id="terms-slider" type="range" min="10" max="75" step="1" value="30">
+              <div class="range-labels" id="range-labels">
+                <span>Net 10</span>
+                <span>Net 30</span>
+                <span>Net 75</span>
+              </div>
+            </div>
+
+            <p class="slider-helper" id="slider-helper">45 days sooner — no change to the invoice amount.</p>
+            <p class="slider-assumption">Assumes 12 invoices a year at the same amount. Estimate only.</p>
+          </div>
+
+          <div class="impact-stack">
+            <article class="impact-tile">
+              <span class="impact-label">Cash freed up</span>
+              <strong class="impact-value" id="freed-cash">$5,917.81</strong>
+              <span class="impact-note">on this invoice, once the new terms apply</span>
+            </article>
+            <article class="impact-tile impact-tile-primary">
+              <span class="impact-label">Worth per year</span>
+              <strong class="impact-value" id="annual-savings">$6,746.30</strong>
+              <span class="impact-note">at 12 invoices a year · estimated</span>
+            </article>
+          </div>
+        </div>
+
+        <details class="method-note">
+          <summary>How these numbers are calculated</summary>
+          <p>In plain terms: the sooner the customer pays, the less time your cash is tied up. Cash freed up = invoice amount × days sooner ÷ 365. Annual value = the yearly difference in estimated cost of float across 12 invoices. The 9.5% rate is a national benchmark — an estimate of what cash could earn — not your actual cost of capital.</p>
+        </details>
+
+        <div class="negotiation-actions">
+          <button class="button button-primary" type="button" id="draft-letter-button" data-action="open-letter">
+            Draft the terms email
+            <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
+          </button>
+          <button class="text-link" type="button" data-action="open-ranking">Compare customers</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-letter" aria-labelledby="letter-title" hidden>
+      <div class="app-inner">
+        <button class="back-link" type="button" data-action="back-negotiation">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back to negotiation
+        </button>
+        <div class="letter-layout">
+          <div class="letter-intro">
+            <p class="eyebrow">Step 5 · The ask</p>
+            <h1 id="letter-title">Turn the number into a conversation.</h1>
+            <p class="lede">A short, plain-English draft using the numbers you just confirmed. Copy it, make it yours, and send it.</p>
+
+            <div class="letter-summary">
+              <div class="summary-row"><span>Customer</span><strong id="letter-customer">Ridgeline Fabrication</strong></div>
+              <div class="summary-row"><span>From</span><strong id="letter-current">Net 75</strong></div>
+              <div class="summary-row"><span>To</span><strong id="letter-proposed">Net 30</strong></div>
+              <div class="summary-row"><span>Annual impact</span><strong id="letter-annual">$6,746.30</strong></div>
+            </div>
+
+            <div class="letter-actions">
+              <button class="button button-primary" type="button" id="copy-letter-button" data-action="copy-letter">
+                <svg class="od-icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+                <span id="copy-letter-label">Copy message</span>
+              </button>
+              <button class="button button-secondary" type="button" data-action="back-negotiation">Adjust the terms</button>
+            </div>
+
+            <p class="legal-note">Draft only. Not legal or contract advice. Stub does not chase payment or send this for you.</p>
+          </div>
+
+          <div class="letter-paper">
+            <div class="letter-paper-topline">
+              <span>Draft message</span>
+              <span class="readonly-badge">Read-only</span>
+            </div>
+            <label class="sr-only" for="letter-output">Terms email draft</label>
+            <textarea id="letter-output" readonly spellcheck="false"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-ranking" aria-labelledby="ranking-title" hidden>
+      <div class="app-inner">
+        <button class="back-link" type="button" data-action="back-results">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back to the invoice
+        </button>
+        <div class="results-heading ranking-heading">
+          <div>
+            <p class="eyebrow">Session view · <span id="ranking-session-count">4 invoices</span></p>
+            <h1 id="ranking-title">Who’s using your cash?</h1>
+            <p class="lede">Grouped across every invoice in this session. This is the cross-customer view a single invoice can’t show you.</p>
+          </div>
+          <span class="invoice-context">Estimated at 9.5%</span>
+        </div>
+
+        <div class="ranking-summary" id="ranking-summary">
+          <div class="summary-stat"><span>Customers</span><strong id="rank-customers">3</strong></div>
+          <div class="summary-stat"><span>Invoices scanned</span><strong id="rank-invoices">4</strong></div>
+          <div class="summary-stat"><span>Estimated float cost</span><strong id="rank-total">$2,050.83</strong></div>
+        </div>
+
+        <div class="rank-board" id="rank-board">
+          <div class="rank-head" aria-hidden="true">
+            <span>Rank</span>
+            <span>Customer</span>
+            <span>Average terms</span>
+            <span>Est. float cost</span>
+            <span>Share</span>
+          </div>
+          <ol class="rank-list" id="ranking-list"></ol>
+        </div>
+
+        <div class="empty-state" id="ranking-empty" hidden>
+          <span class="empty-icon" aria-hidden="true">
+            <svg class="od-icon od-icon-xl" aria-hidden="true"><use href="#i-ranking"></use></svg>
+          </span>
+          <h2>One invoice isn’t a pattern yet.</h2>
+          <p>Scan a second customer’s invoice to see where your money is actually going. Or load the demo set to see a complete ranking.</p>
+          <div class="empty-actions">
+            <button class="button button-primary" type="button" data-action="choose-scan">Scan another invoice</button>
+            <button class="button button-secondary" type="button" data-action="seed-demo">Load demo invoices</button>
+          </div>
+        </div>
+
+        <p class="ranking-note">Ranked by estimated cost of float — what each customer’s delays cost at a 9.5% benchmark, not by invoice size alone. The cash tied up is exact; this ranking is an estimate.</p>
+
+        <div class="result-actions">
+          <button class="button button-secondary" type="button" data-action="choose-scan">Scan another invoice</button>
+          <button class="text-link" type="button" data-action="back-results">Back to the invoice</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen app-screen" id="screen-error" aria-labelledby="error-title" hidden>
+      <div class="app-inner error-inner">
+        <button class="back-link" type="button" data-action="back-landing">
+          <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
+          Back
+        </button>
+        <div class="error-card">
+          <span class="error-icon" aria-hidden="true">
+            <svg class="od-icon od-icon-xl" aria-hidden="true"><use href="#i-alert"></use></svg>
+          </span>
+          <p class="eyebrow">Reading issue</p>
+          <h1 id="error-title">We couldn’t read that invoice.</h1>
+          <p class="error-message" id="error-message">Try a JPG, PNG, WebP, or PDF under 10 MB.</p>
+          <p class="error-detail" id="error-detail"></p>
+          <div class="error-actions">
+            <button class="button button-primary" type="button" data-action="back-scan">Try another invoice</button>
+            <button class="button button-secondary" type="button" data-action="demo">Use demo data instead</button>
+          </div>
+          <p class="quiet-note">No file was saved. Nothing left your browser.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <span class="footer-brand">stub<span aria-hidden="true">.</span></span>
+      <p>The cost of waiting, made visible. Prototype only — not accounting, legal, or financial advice.</p>
+      <span class="footer-note">No bank connection. No payment chasing.</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js" defer></script>
+</body>
+</html>
