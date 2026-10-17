@@ -1,3 +1,5 @@
+import { extractInvoice } from "./extract";
+
 export interface InvoiceData {
   invoiceAmount: number;
   termsDays: number;
@@ -22,6 +24,16 @@ export function getDemoData() {
   };
 }
 
-export async function scanInvoice(image: string, mimeType: string) {
-  return getDemoData();
+
+export async function scanInvoice(
+  image: string,
+  mimeType: string
+) {
+  const extractedData = await extractInvoice(image, mimeType);
+
+  return {
+    success: true,
+    data: extractedData,
+    source: "gemini" as const
+  };
 }
