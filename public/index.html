@@ -173,7 +173,7 @@
         <div class="screen-heading">
           <p class="eyebrow">Step 1 · Invoice intake</p>
           <h1 id="scan-title">Start with one invoice.</h1>
-          <p class="lede">Upload an image or PDF. Stub pulls out the amount, payment terms, due date, and customer — then you confirm every field before any math runs.</p>
+          <p class="lede">Upload an image or PDF.</p>
         </div>
 
         <div class="scan-layout">
@@ -246,7 +246,7 @@
 
             <div class="form-grid">
               <div class="field" data-field="customer">
-                <label for="field-customer">Customer <span class="required-mark" aria-hidden="true">*</span> <span class="field-flag" id="flag-customer" hidden>Check this</span></label>
+                <label for="field-customer">Customer <span class="required-mark" aria-hidden="true">*</span> </label>
                 <input id="field-customer" name="customer" type="text" autocomplete="organization" maxlength="80" required aria-describedby="helper-customer error-customer">
                 <p class="field-helper" id="helper-customer">Who is this invoice from?</p>
                 <p class="field-error" id="error-customer" hidden></p>
@@ -280,7 +280,7 @@
               </div>
 
               <div class="field field-full" data-field="discountTerms">
-                <label for="field-discount">Early-payment discount <span class="optional-mark">Optional</span> <span class="field-flag" id="flag-discount" hidden>Not detected</span></label>
+                <label for="field-discount">Early-payment discount <span class="optional-mark">Optional</span></label>
                 <input id="field-discount" name="discountTerms" type="text" maxlength="60" placeholder="e.g. 2/10 Net 30" aria-describedby="helper-discount error-discount">
                 <p class="field-helper" id="helper-discount">Leave blank if the invoice has no discount clause. Stub will never guess one.</p>
                 <p class="field-error" id="error-discount" hidden></p>
@@ -292,7 +292,7 @@
                 See what the wait costs
                 <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
               </button>
-              <span class="form-actions-note">Editable before and after the math.</span>
+              <span class="form-actions-note">You can update these details at any time.</span>
             </div>
           </form>
 
@@ -310,11 +310,11 @@
             </div>
 
             <div class="review-explainer">
-              <p class="eyebrow">What happens next</p>
+              <p class="eyebrow">From invoice to insight</p>
               <ol class="numbered-list">
-                <li><span>01</span><p>What you are owed is exact. What the wait costs is an estimate.</p></li>
-                <li><span>02</span><p>The Float Clock shows that estimate adding up in real time.</p></li>
-                <li><span>03</span><p>Move the terms and draft a message.</p></li>
+                <li><span>01</span><p>Review your invoice details. Check the amount, due date, customer, and payment terms before moving forward.</p></li>
+                <li><span>02</span><p>See the cost of waiting and an estimate of the financing cost associated with your payment timeline.</p></li>
+                <li><span>03</span><p>Choose your next step. Explore payment terms, compare customers, or prepare a message to send..</p></li>
               </ol>
             </div>
 
@@ -335,9 +335,9 @@
         </button>
         <div class="results-heading">
           <div>
-            <p class="eyebrow">Step 3 · The numbers</p>
-            <h1 id="results-title">Two numbers, kept separate.</h1>
-            <p class="lede">What you are owed is exact. What the wait costs is an estimate, based on a national benchmark rate rather than your own cost of capital. Stub keeps them apart so you always know which is which.</p>
+            <p class="eyebrow">STEP 3 · YOUR COST ESTIMATE</p>
+            <h1 id="results-title">See what waiting for payment may cost.</h1>
+            <p class="lede">Your invoice amount is what you are owed. Your estimated cost of float shows what the time spent waiting could cost at your selected annual rate. Keeping them separate helps you understand the difference between the money due to you and the estimated cost of waiting for it..</p>
           </div>
           <span class="invoice-context" id="invoice-context">INV-2048 · Ridgeline Fabrication</span>
         </div>
@@ -389,7 +389,7 @@
           <div class="clock-main">
             <div class="clock-copy">
               <h2 id="clock-title">Every second has a price.</h2>
-              <p>This is what the wait costs, adding up second by second — the number that is easy to feel and hard to put in a spreadsheet.</p>
+              <p>Know what you are owed, understand what waiting may cost, and identify opportunities to manage your money more strategically. Get the clarity to move forward with confidence.</p>
             </div>
             <div class="clock-readout">
               <span class="clock-value" id="clock-value" aria-label="Cost of float accumulating">$0.000000</span>
