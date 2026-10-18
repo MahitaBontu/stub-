@@ -74,11 +74,11 @@
             </p>
           </div>
 
-          
+
         </div>
 
         <div class="feature-band" aria-label="What Stub does"><h3>What we give you:</h3>
-        
+
           <article class="feature">
             <span class="feature-index">01</span>
             <div>
@@ -420,9 +420,55 @@
               </div>
             </div>
 
-            <p class="slider-helper" id="slider-helper">45 days sooner — no change to the invoice amount.</p>
-            <p class="slider-assumption">Assumes 12 invoices a year at the same amount. Estimate only.</p>
+          <div class="negotiation-assumptions">
+
+            <div class="negotiation-assumption-field">
+              <label for="assumption-rate">
+                Annual financing rate (%)
+              </label>
+              <input
+                id="assumption-rate"
+                type="number"
+                min="0"
+                max="100"
+                step="0.1"
+                value="9.5"
+              />
+              <p class="field-error"
+                id="assumption-rate-error"
+                hidden></p>
+            </div>
+
+            <div class="negotiation-assumption-field">
+              <label for="assumption-invoices">
+                Similar invoices per year
+              </label>
+              <input
+                id="assumption-invoices"
+                type="number"
+                min="1"
+                max="1000"
+                step="1"
+                value="12"
+              />
+              <p class="field-error"
+                id="assumption-invoices-error"
+                hidden></p>
+            </div>
+
+
           </div>
+
+          <p class="slider-helper" id="slider-helper">
+            45 days sooner — no change to the invoice amount.
+          </p>
+
+          <p class="slider-assumption" id="negotiation-assumption">
+            Based on 12 similar invoices/year and a 9.5% annual financing rate.
+          </p>
+
+          </div>
+
 
           <div class="impact-stack">
             <article class="impact-tile">
@@ -433,7 +479,9 @@
             <article class="impact-tile impact-tile-primary">
               <span class="impact-label">EST. ANNUAL SAVINGS</span>
               <strong class="impact-value" id="annual-savings">$6,746.30</strong>
-              <span class="impact-note">at 12 invoices a year · estimated</span>
+                <span class="impact-note" id="annual-impact-note">
+                  Based on 12 similar invoices/year
+                </span>
             </article>
           </div>
         </div>
@@ -441,27 +489,30 @@
         <details class="method-note">
           <summary>Where do these numbers come from?</summary>
 
-          <p>
-            Stub estimates savings using an assumed
-            <strong>9.5% annual financing rate.</strong>
-          </p>
+            <p>
+              Stub estimates savings using your selected
+              <strong id="method-rate">9.5%</strong>
+              annual financing rate.
+            </p>
 
-          <p>
-            <strong>Cost avoided per invoice:</strong><br>
-            Invoice amount × 9.5% × Days saved ÷ 365
-          </p>
+            <p>
+              <strong>Cost avoided per invoice:</strong>
+              Invoice amount × rate × days saved ÷ 365.
+            </p>
 
-          <p>
-            <strong>Estimated annual savings:</strong><br>
-            Cost avoided per invoice × 12 invoices
-          </p>
+            <p>
+              <strong>Estimated annual savings:</strong>
+              Cost avoided per invoice ×
+              <strong id="method-invoice-count">12</strong>
+              similar invoices.
+            </p>
 
-          <p>
-            <small>
-              Estimates assume 12 similar invoices per year.
-              Actual savings depend on financing costs and payment timing.
-            </small>
-          </p>
+            <p>
+              <small>
+                These estimates depend on your financing costs
+                and actual payment timing.
+              </small>
+            </p>
 
         </details>
 
