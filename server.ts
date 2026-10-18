@@ -1,16 +1,17 @@
 import 'dotenv/config';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
+import path from 'path';
 
 import { scanInvoice, getDemoData } from './prompts';
-import { retrieveRelevantInvoices } from './backend/calculations/retrieve';
+import { retrieveRelevantInvoices } from './RAG/retrieve';
 import { analyzeInvoice, calcNegotiationImpact, buildLeverageLetter, rankCustomers } from './findings';
 import { recordDeposit } from './nessie';
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 interface ScannedInvoice {
   customerName: string;
@@ -19,7 +20,15 @@ interface ScannedInvoice {
   costOfFloat: number;
   industry?: string;
 }
-let scannedInvoices: ScannedInvoice[] = [];
+
+const invoicesByBusiness = new Map<string, ScannedInvoice[]>();
+
+function getInvoicesFor(businessId: string): ScannedInvoice[] {
+  if (!invoicesByBusiness.has(businessId)) {
+    invoicesByBusiness.set(businessId, []);
+  }
+  return invoicesByBusiness.get(businessId)!;
+}
 
 
 app.post("/scan", async (req: Request, res: Response) => {
@@ -59,9 +68,10 @@ app.post("/scan", async (req: Request, res: Response) => {
 
 app.post('/analyze', (req: Request, res: Response) => {
   try {
-    const { invoiceAmount, termsDays, discountTerms, customerName } = req.body;
+    const { invoiceAmount, termsDays, discountTerms, customerName, businessId } = req.body;
     const result = analyzeInvoice(Number(invoiceAmount), Number(termsDays), discountTerms);
-    scannedInvoices.push({ customerName, invoiceAmount, termsDays, costOfFloat: result.costOfFloat.estimatedCost, industry: req.body.industry });
+    const invoices = getInvoicesFor(businessId || 'default');
+    invoices.push({ customerName, invoiceAmount, termsDays, costOfFloat: result.costOfFloat.estimatedCost, industry: req.body.industry });
     res.json({ success: true, ...result });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
@@ -70,10 +80,11 @@ app.post('/analyze', (req: Request, res: Response) => {
 
 app.post('/negotiate', (req: Request, res: Response) => {
   try {
-    const { invoiceAmount, currentDays, proposedDays, invoicesPerYear, customerName, industry } = req.body;
+    const { invoiceAmount, currentDays, proposedDays, invoicesPerYear, customerName, industry, businessId } = req.body;
     const result = calcNegotiationImpact(Number(invoiceAmount), Number(currentDays), Number(proposedDays), Number(invoicesPerYear) || 12);
 
-    const context = retrieveRelevantInvoices(scannedInvoices, customerName || '', industry);
+    const invoices = getInvoicesFor(businessId || 'default');
+    const context = retrieveRelevantInvoices(invoices, customerName || '', industry);
 
     res.json({ success: true, ...result, retrievedContext: context.summary, historyCount: context.matchedInvoices.length });
   } catch (err: any) {
@@ -83,8 +94,9 @@ app.post('/negotiate', (req: Request, res: Response) => {
 
 app.post('/letter', (req: Request, res: Response) => {
   try {
-    const { customerName, invoiceAmount, currentDays, proposedDays, annualSavings, industry } = req.body;
-    const context = retrieveRelevantInvoices(scannedInvoices, customerName, industry);
+    const { customerName, invoiceAmount, currentDays, proposedDays, annualSavings, industry, businessId } = req.body;
+    const invoices = getInvoicesFor(businessId || 'default');
+    const context = retrieveRelevantInvoices(invoices, customerName, industry);
     let letterText = buildLeverageLetter(customerName, invoiceAmount, currentDays, proposedDays, annualSavings);
 
     if (context.matchedInvoices.length > 0) {
@@ -99,7 +111,8 @@ app.post('/letter', (req: Request, res: Response) => {
 
 app.post('/rank', (req: Request, res: Response) => {
   try {
-    res.json({ success: true, ranking: rankCustomers(scannedInvoices) });
+    const invoices = getInvoicesFor(req.body.businessId || 'default');
+    res.json({ success: true, ranking: rankCustomers(invoices) });
   } catch (err: any) {
     res.status(400).json({ success: false, error: err.message });
   }
