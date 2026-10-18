@@ -55,6 +55,7 @@ const state = {
     // Default financial assumptions
     annualRate: BENCHMARK_RATE,
     invoicesPerYear: INVOICES_PER_YEAR,
+    rankingFrom: "",
     uploadName: "",
     scanTimers: [],
     scanning: false,
@@ -1046,6 +1047,7 @@ function renderRanking() {
     });
 }
 function openRanking() {
+    if (state.screen !== "ranking") state.rankingFrom = state.screen;
     renderRanking();
     showScreen("ranking");
 }
@@ -1135,6 +1137,19 @@ function handleAction(action) {
                 showScreen("negotiation");
             }
             else {
+                showScreen("landing");
+            }
+            break;
+                case "back-ranking":
+            if (state.current) {
+                if (state.rankingFrom === "negotiation") {
+                    renderNegotiation();
+                    showScreen("negotiation");
+                } else {
+                    renderResults();
+                    showScreen("results");
+                }
+            } else {
                 showScreen("landing");
             }
             break;
