@@ -52,7 +52,9 @@ const state = {
     current: null,
     session: [],
     proposedDays: 30,
-    rankingFrom: "",
+    // Default financial assumptions
+    annualRate: BENCHMARK_RATE,
+    invoicesPerYear: INVOICES_PER_YEAR,
     uploadName: "",
     scanTimers: [],
     scanning: false,
@@ -97,6 +99,8 @@ const els = {
     exactCopy: findElement("#exact-copy"),
     exactFootnote: findElement("#exact-footnote"),
     estimateAmount: findElement("#estimate-amount"),
+    resultsRate: findElement("#rate-input"),
+    resultsRateError: findElement("#rate-error"),
     estimateCopy: findElement("#estimate-copy"),
     benchmarkComparison: findElement("#benchmark-comparison"),
     estimateDays: findElement("#estimate-days"),
@@ -110,8 +114,18 @@ const els = {
     termsSlider: findElement("#terms-slider"),
     rangeLabels: findElement("#range-labels"),
     sliderHelper: findElement("#slider-helper"),
+    // Customizable financial assumptions
+    assumptionRate: findElement("#assumption-rate"),
+    assumptionInvoices: findElement("#assumption-invoices"),
+    assumptionRateError: findElement("#assumption-rate-error"),
+    assumptionInvoicesError: findElement("#assumption-invoices-error"),
+    negotiationAssumption: findElement("#negotiation-assumption"),
+    // Negotiation results
     freedCash: findElement("#freed-cash"),
     annualSavings: findElement("#annual-savings"),
+    annualImpactNote: findElement("#annual-impact-note"),
+    methodRate: findElement("#method-rate"),
+    methodInvoiceCount: findElement("#method-invoice-count"),
     draftLetterButton: findElement("#draft-letter-button"),
     letterOutput: findElement("#letter-output"),
     letterCustomer: findElement("#letter-customer"),
@@ -209,7 +223,7 @@ function issueDateFor(invoice) {
     due.setDate(due.getDate() - invoice.termsDays);
     return due.toISOString().slice(0, 10);
 }
-function calcCostOfFloat(invoiceAmount, daysUntilPaid, rate = BENCHMARK_RATE) {
+function calcCostOfFloat(invoiceAmount, daysUntilPaid, rate = state.annualRate) {
     return invoiceAmount * (daysUntilPaid / 365) * rate;
 }
 function calcSavingsPerInvoice(invoiceAmount, currentDays, proposedDays) {
@@ -217,7 +231,7 @@ function calcSavingsPerInvoice(invoiceAmount, currentDays, proposedDays) {
     const proposedCost = calcCostOfFloat(invoiceAmount, proposedDays);
     return Math.max(0, currentCost - proposedCost);
 }
-function calcAnnualSavings(invoiceAmount, currentDays, proposedDays, invoicesPerYear = INVOICES_PER_YEAR) {
+function calcAnnualSavings(invoiceAmount, currentDays, proposedDays, invoicesPerYear = state.invoicesPerYear) {
     return calcSavingsPerInvoice(invoiceAmount, currentDays, proposedDays) * invoicesPerYear;
 }
 function defaultProposedDays(currentDays) {
@@ -728,6 +742,9 @@ function renderResults() {
     const invoice = state.current;
     if (!invoice)
         return;
+    if (document.activeElement !== els.resultsRate) {
+        els.resultsRate.value = String(Number((state.annualRate * 100).toFixed(2)));
+    }
     const costOfFloat = calcCostOfFloat(invoice.amount, invoice.termsDays);
     const issueDate = issueDateFor(invoice);
     els.invoiceContext.textContent = `${invoice.number || "Invoice"} · ${invoice.customer}`;
@@ -736,7 +753,11 @@ function renderResults() {
     const discountLine = invoice.discountTerms ? ` Discount clause: ${invoice.discountTerms}.` : "";
     els.exactFootnote.textContent = `Principal due ${formatFullDate(invoice.dueDate)}. This is not an estimate.${discountLine}`;
     els.estimateAmount.textContent = formatMoney(costOfFloat);
-    els.estimateCopy.innerHTML = `Cost of float is what the wait costs you. At the <strong>9.5%</strong> national average cost of capital — a standard estimate of what cash could earn — ${invoice.termsDays} days of delay comes to this estimate.`;
+    const selectedRate = Number((state.annualRate * 100).toFixed(2));
+    els.estimateCopy.textContent =
+        `Using your selected ${selectedRate}% annual financing rate, ` +
+            `the estimated financing cost of waiting ${invoice.termsDays} days ` +
+            `is ${formatMoney(costOfFloat)}.`;
     els.benchmarkComparison.textContent = benchmarkLabel(invoice.termsDays);
     els.estimateDays.textContent = `${invoice.termsDays}-day wait`;
     els.timelineIssued.textContent = issueDate ? `Issued ${formatShortDate(issueDate)}` : "Issued";
@@ -784,6 +805,8 @@ function renderNegotiation() {
     const invoice = state.current;
     if (!invoice)
         return;
+    els.assumptionRate.value = String(Number((state.annualRate * 100).toFixed(2)));
+    els.assumptionInvoices.value = String(state.invoicesPerYear);
     const minimum = invoice.termsDays > 10 ? 10 : 1;
     const maximum = invoice.termsDays;
     state.proposedDays = clamp(Math.round(state.proposedDays || defaultProposedDays(invoice.termsDays)), minimum, maximum);
@@ -831,6 +854,18 @@ function updateNegotiation() {
     els.proposedTermsLabel.textContent = `Net ${proposed}`;
     els.freedCash.textContent = formatMoney(savingsPerInvoice);
     els.annualSavings.textContent = formatMoney(annualSavings);
+    const displayRate = Number((state.annualRate * 100).toFixed(2));
+    // Update the explanation below the slider
+    els.negotiationAssumption.textContent =
+        `Based on ${state.invoicesPerYear} similar invoices/year ` +
+            `and a ${displayRate}% annual financing rate.`;
+    // Update the annual savings card
+    els.annualImpactNote.textContent =
+        `Based on ${state.invoicesPerYear} similar invoices/year`;
+    // Update the calculation explanation
+    els.methodRate.textContent = `${displayRate}%`;
+    els.methodInvoiceCount.textContent =
+        String(state.invoicesPerYear);
     els.sliderHelper.textContent = daysSaved > 0
         ? `${daysSaved} days sooner — no change to the invoice amount.`
         : "Same terms — no impact to show.";
@@ -838,51 +873,26 @@ function updateNegotiation() {
     els.draftLetterButton.disabled = !hasImpact;
     els.draftLetterButton.setAttribute("aria-disabled", String(!hasImpact));
 }
-function retrieveCustomerHistory(customerName) {
-  const priorInvoices = (state.session || []).filter(
-    (inv) => inv.customer === customerName && inv.id !== state.current?.id
-  );
-  if (priorInvoices.length === 0) return null;
-
-
-  const avgTerms = Math.round(
-    priorInvoices.reduce((sum, inv) => sum + inv.termsDays, 0) / priorInvoices.length
-  );
-  const totalAmount = priorInvoices.reduce((sum, inv) => sum + inv.amount, 0);
-
-
-  return `${priorInvoices.length} prior invoice${priorInvoices.length === 1 ? "" : "s"} on file for ${customerName} (${formatMoney(totalAmount)} total), averaging Net ${avgTerms} terms.`;
-}
-
-
 function buildLeverageLetter() {
-  const invoice = state.current;
-  if (!invoice) return "";
+    const invoice = state.current;
+    if (!invoice)
+        return "";
+    const proposed = state.proposedDays;
+    const costOfFloat = calcCostOfFloat(invoice.amount, invoice.termsDays);
+    const savingsPerInvoice = calcSavingsPerInvoice(invoice.amount, invoice.termsDays, proposed);
+    const annualSavings = calcAnnualSavings(invoice.amount, invoice.termsDays, proposed);
+    const daysSaved = Math.max(0, invoice.termsDays - proposed);
+    return `Hi ${invoice.customer} team,
 
+I wanted to raise something practical about our payment terms. Our current Net ${invoice.termsDays} arrangement keeps ${formatMoney(invoice.amount)} unpaid for ${invoice.termsDays} days after each invoice. Using an assumed ${Number((state.annualRate * 100).toFixed(2))}% annual financing rate, the estimated cost of waiting is ${formatMoney(costOfFloat)} per invoice.
 
-  const proposed = state.proposedDays;
-  const costOfFloat = calcCostOfFloat(invoice.amount, invoice.termsDays);
-  const savedPerInvoice = calcSavingsPerInvoice(invoice.amount, invoice.termsDays, proposed);  const annualSavings = calcAnnualSavings(invoice.amount, invoice.termsDays, proposed);
-  const history = retrieveCustomerHistory(invoice.customer);
-
-
-  return `Hi ${invoice.customer} team,
-
-
-I wanted to raise something practical about our payment terms. Our current Net ${invoice.termsDays} arrangement keeps ${formatMoney(invoice.amount)} tied up for ${invoice.termsDays} days after each invoice. At a 9.5% annual cost of capital — a standard estimate of what that cash could earn elsewhere — the delay costs us about ${formatMoney(costOfFloat)} per invoice.
-
-
-We value working with you, and I think there is a straightforward improvement for both of us: moving to Net ${proposed} would cut that financing cost by about ${formatMoney(savedPerInvoice)} per invoice cycle. Across ${INVOICES_PER_YEAR} invoices a year, that is roughly ${formatMoney(annualSavings)} back into the business.
-
+We value working with you, and moving to Net ${proposed} would let us receive ${formatMoney(invoice.amount)} ${daysSaved} days sooner. Based on that same financing-rate assumption, it could avoid about ${formatMoney(savingsPerInvoice)} in financing costs per invoice. Across ${state.invoicesPerYear} similar invoices per year, that could total approximately ${formatMoney(annualSavings)} in avoided financing costs.
 
 Would you be open to updating our terms to Net ${proposed} for future invoices? Happy to talk through what works on your side.
 
-
 Thanks,
-[Your name]${history ? `\n\n(Context: ${history})` : ""}`;
+[Your name]`;
 }
-
-
 function openLetter() {
     if (!state.current)
         return;
@@ -1036,7 +1046,6 @@ function renderRanking() {
     });
 }
 function openRanking() {
-    if (state.screen !== "ranking") state.rankingFrom = state.screen;
     renderRanking();
     showScreen("ranking");
 }
@@ -1126,19 +1135,6 @@ function handleAction(action) {
                 showScreen("negotiation");
             }
             else {
-                showScreen("landing");
-            }
-            break;
-                case "back-ranking":
-            if (state.current) {
-                if (state.rankingFrom === "negotiation") {
-                    renderNegotiation();
-                    showScreen("negotiation");
-                } else {
-                    renderResults();
-                    showScreen("results");
-                }
-            } else {
                 showScreen("landing");
             }
             break;
@@ -1241,6 +1237,71 @@ els.reviewForm.addEventListener("focusout", (event) => {
     validateField(name, readReviewForm());
 });
 els.termsSlider.addEventListener("input", updateNegotiation);
+// Update the annual financing rate
+els.assumptionRate.addEventListener("input", () => {
+    const raw = els.assumptionRate.value.trim();
+    const rate = Number(raw);
+    const valid = raw !== "" &&
+        Number.isFinite(rate) &&
+        rate >= 0 &&
+        rate <= 100;
+    if (!valid) {
+        els.assumptionRateError.textContent =
+            "Enter a rate between 0% and 100%.";
+        els.assumptionRateError.hidden = false;
+        els.assumptionRate.setAttribute("aria-invalid", "true");
+        return;
+    }
+    els.assumptionRateError.hidden = true;
+    els.assumptionRate.removeAttribute("aria-invalid");
+    // Convert percentage to decimal (12% becomes 0.12)
+    state.annualRate = rate / 100;
+    updateNegotiation();
+});
+// Update the number of invoices per year
+els.assumptionInvoices.addEventListener("input", () => {
+    const raw = els.assumptionInvoices.value.trim();
+    const count = Number(raw);
+    const valid = raw !== "" &&
+        Number.isInteger(count) &&
+        count >= 1 &&
+        count <= 1000;
+    if (!valid) {
+        els.assumptionInvoicesError.textContent =
+            "Enter a whole number between 1 and 1000.";
+        els.assumptionInvoicesError.hidden = false;
+        els.assumptionInvoices.setAttribute("aria-invalid", "true");
+        return;
+    }
+    els.assumptionInvoicesError.hidden = true;
+    els.assumptionInvoices.removeAttribute("aria-invalid");
+    state.invoicesPerYear = count;
+    updateNegotiation();
+});
+// Update the financing rate on the RESULTS page
+els.resultsRate.addEventListener("input", () => {
+    const raw = els.resultsRate.value.trim();
+    const rate = Number(raw);
+    const valid = raw !== "" &&
+        Number.isFinite(rate) &&
+        rate >= 0 &&
+        rate <= 100;
+    if (!valid) {
+        els.resultsRateError.textContent =
+            "Enter a rate between 0% and 100%.";
+        els.resultsRateError.hidden = false;
+        els.resultsRate.setAttribute("aria-invalid", "true");
+        return;
+    }
+    els.resultsRateError.hidden = true;
+    els.resultsRate.removeAttribute("aria-invalid");
+    state.annualRate = rate / 100;
+    // Keep negotiation simulator in sync
+    els.assumptionRate.value = raw;
+    // Recalculate the results page
+    renderResults();
+    startClock();
+});
 window.addEventListener("beforeunload", stopClock);
 updateHeader();
 prepareScanIdle();
