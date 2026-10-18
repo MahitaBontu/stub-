@@ -33,33 +33,33 @@
 }
 
 :root {
-  --ink: #1d1628;
-  --ink-soft: #453b54;
-  --muted: #6d647d;
-  --muted-strong: #5b5269;
-  --canvas: #f6f4fa;
+  --ink: #660033;
+  --ink-soft: #7a3354;
+  --muted: #8a5a70;
+  --muted-strong: #70384f;
+  --canvas: #fff6e6;
   --surface: #ffffff;
-  --surface-soft: #f1edf8;
-  --surface-tint: #fbf9ff;
-  --primary: #5b3fd6;
-  --primary-hover: #4b2fc7;
-  --primary-press: #3d23a8;
-  --primary-ink: #3d238f;
-  --primary-soft: #e9e3ff;
-  --primary-wash: #f3efff;
-  --plum: #21172f;
-  --plum-soft: #2d2040;
-  --line: #e2dcec;
-  --line-strong: #cbc2dc;
+  --surface-soft: #f7ecd3;
+  --surface-tint: #fffbf0;
+  --primary: #D4AF37;
+  --primary-hover: #b8932a;
+  --primary-press: #9a7a1f;
+  --primary-ink: #660033;
+  --primary-soft: #f3e3b0;
+  --primary-wash: #fbf2d6;
+  --plum: #3d0020;
+  --plum-soft: #4f0029;
+  --line: #ecdcc0;
+  --line-strong: #d9c49a;
   --amber-ink: #784800;
   --amber-bg: #fff4dc;
   --amber-line: #ead4a7;
-  --danger: #a3283c;
+  --danger: #8c1c3a;
   --danger-bg: #fdeef1;
   --danger-line: #f0c8d0;
   --success: #14664a;
   --success-bg: #e8f6ef;
-  --focus: #7a5cff;
+  --focus: #660033;
   --font-sans: "Manrope", "Aptos", "Segoe UI", sans-serif;
   --font-display: "Instrument Serif", "Iowan Old Style", Georgia, serif;
   --font-mono: "IBM Plex Mono", "Cascadia Mono", Consolas, monospace;
@@ -67,8 +67,8 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 26px;
-  --shadow-soft: 0 20px 60px -40px rgba(29, 22, 40, 0.35);
-  --shadow-lift: 0 18px 38px -28px rgba(52, 33, 112, 0.4);
+  --shadow-soft: 0 20px 60px -40px rgba(60, 0, 30, 0.35);
+  --shadow-lift: 0 18px 38px -28px rgba(102, 0, 51, 0.4);
   --transition: 200ms ease;
 }
 
@@ -332,7 +332,7 @@ summary:focus:not(:focus-visible) {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: #746b84;
+  color: #8a5a70;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.04em;
@@ -379,7 +379,7 @@ summary:focus:not(:focus-visible) {
 .step.is-active .step-index {
   border-color: var(--primary);
   background: var(--primary);
-  color: #fff;
+  color: #660033;
 }
 
 .screen {
@@ -465,7 +465,7 @@ summary:focus:not(:focus-visible) {
 .button-primary {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: #660033;  
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.18) inset, 0 12px 26px -18px rgba(91, 63, 214, 0.75);
 }
 
@@ -747,7 +747,7 @@ summary:focus:not(:focus-visible) {
 .proof-note,
 .proof-live {
   display: block;
-  color: #bfb2d4;
+  color: #e6cf8a;
   font-size: 10.5px;
   line-height: 1.5;
 }
@@ -794,7 +794,7 @@ summary:focus:not(:focus-visible) {
 }
 
 .proof-rate small {
-  color: #b5a5cd;
+  color: #e6cf8a;
   font-size: 10px;
 }
 
@@ -803,7 +803,7 @@ summary:focus:not(:focus-visible) {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #b9a5ff;
+  background: #D4AF37;
   box-shadow: 0 0 0 0 rgba(185, 165, 255, 0.5);
   animation: pulse 2.4s infinite;
 }
@@ -911,7 +911,7 @@ summary:focus:not(:focus-visible) {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--surface);
-  box-shadow: 0 1px 0 rgba(29, 22, 40, 0.02);
+  box-shadow: 0 1px 0 rgba(60, 0, 30, 0.02);
 }
 
 .scan-layout {
@@ -996,7 +996,7 @@ summary:focus:not(:focus-visible) {
 
 .dropzone:hover .drop-button {
   background: var(--primary);
-  color: #fff;
+  color: #660033;
 }
 
 .demo-row {
@@ -1303,12 +1303,12 @@ summary:focus:not(:focus-visible) {
 
 .field input::placeholder,
 .field textarea::placeholder {
-  color: #7c728d;
+  color: #9a7088;
   font-weight: 500;
 }
 
 .field input:hover {
-  border-color: #b7aacb;
+  border-color: #d9c49a;
 }
 
 .field input:focus,
@@ -1413,7 +1413,7 @@ summary:focus:not(:focus-visible) {
 }
 
 .snapshot .eyebrow {
-  color: #c9bce1;
+  color: #e6cf8a;
 }
 
 .snapshot .mini-pill {
@@ -1450,7 +1450,7 @@ summary:focus:not(:focus-visible) {
 
 .snapshot-row span {
   flex: none;
-  color: #b7aac7;
+  color: #e6cf8a;
   font-size: 10.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -1684,7 +1684,7 @@ summary:focus:not(:focus-visible) {
 .clock-card {
   margin-top: 22px;
   padding: 28px 30px 22px;
-  border: 1px solid #352748;
+  border: 1px solid #5a002d;
   border-radius: var(--radius-lg);
   background: var(--plum);
   color: #fff;
@@ -1703,7 +1703,7 @@ summary:focus:not(:focus-visible) {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #d9cef1;
+  color: #e6cf8a;
   font-size: 10.5px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -1711,7 +1711,7 @@ summary:focus:not(:focus-visible) {
 }
 
 .clock-since {
-  color: #b7a9cc;
+  color: #e6cf8a;
   font-family: var(--font-mono);
   font-size: 10.5px;
   letter-spacing: -0.01em;
@@ -1740,7 +1740,7 @@ summary:focus:not(:focus-visible) {
 .clock-copy p {
   max-width: 50ch;
   margin-top: 10px;
-  color: #c2b5d2;
+  color: #e6cf8a;
   font-size: 13px;
   line-height: 1.6;
 }
@@ -1765,7 +1765,7 @@ summary:focus:not(:focus-visible) {
 .clock-rate {
   display: block;
   margin-top: 8px;
-  color: #c2b5d2;
+  color: #e6cf8a;
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: -0.015em;
@@ -1780,7 +1780,7 @@ summary:focus:not(:focus-visible) {
   margin-top: 26px;
   padding-top: 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.11);
-  color: #b7a9cc;
+  color: #e6cf8a;
   font-size: 10.5px;
   line-height: 1.5;
 }
@@ -1979,7 +1979,7 @@ input[type="range"]:focus-visible {
 .impact-tile-primary {
   border-color: var(--primary);
   background: var(--primary);
-  color: #fff;
+  color: #660033;
 }
 
 .impact-label {
@@ -1991,7 +1991,7 @@ input[type="range"]:focus-visible {
 }
 
 .impact-tile-primary .impact-label {
-  color: #c9bdf1;
+  color: #660033;
 }
 
 .impact-value {
@@ -2008,7 +2008,7 @@ input[type="range"]:focus-visible {
 }
 
 .impact-tile-primary .impact-value {
-  color: #fff;
+  color: #660033;
 }
 
 .impact-note {
@@ -2019,7 +2019,7 @@ input[type="range"]:focus-visible {
 }
 
 .impact-tile-primary .impact-note {
-  color: #d9d0f3;
+  color: #7a3354;
 }
 
 .method-note {
@@ -3138,4 +3138,316 @@ input[type="range"]:focus-visible {
 .rate-field .input-wrap input {
   min-height: 44px;
   font-size: 15px;
+}
+/* ═════════ EFFECTS BLOCK ═════════
+   In styles.css, delete everything from the old "EFFECTS" comment
+   to the end of the file, then paste this whole file in its place. */
+
+/* ───────── Moving gradient background (never stops) ───────── */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(120deg, #fff6e6, #fff6e6, #fff6e6, #fff6e6, #fff6e6);
+  background-size: 300% 300%;
+  animation: aurora-shift 30s ease-in-out infinite;
+}
+.aurora i {
+  position: absolute;
+  width: 56vmax;
+  height: 56vmax;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.72;
+  will-change: transform;
+}
+.aurora i:nth-child(1) {
+  top: -14vmax; left: -14vmax;
+  background: radial-gradient(circle, rgba(218, 123, 123, 0.55), transparent 65%);
+  animation: drift-1 34s ease-in-out infinite;
+}
+.aurora i:nth-child(2) {
+  top: -10vmax; right: -16vmax;
+  background: radial-gradient(circle, rgba(255, 203, 160, 0.5), transparent 65%);
+  animation: drift-2 41s ease-in-out infinite;
+}
+.aurora i:nth-child(3) {
+  bottom: -18vmax; left: 8vmax;
+  background: radial-gradient(circle, rgba(255, 124, 124, 0.5), transparent 65%);
+  animation: drift-3 38s ease-in-out infinite;
+}
+.aurora i:nth-child(4) {
+  bottom: -14vmax; right: -10vmax;
+  background: radial-gradient(circle, rgba(255, 196, 165, 0.6), transparent 65%);
+  animation: drift-4 47s ease-in-out infinite;
+}
+@keyframes aurora-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+@keyframes drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%      { transform: translate(60vw, 14vh) scale(1.2); }
+  50%      { transform: translate(40vw, 64vh) scale(0.9); }
+  75%      { transform: translate(-4vw, 42vh) scale(1.15); }
+}
+@keyframes drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1.1); }
+  30%      { transform: translate(-55vw, 32vh) scale(0.9); }
+  60%      { transform: translate(-22vw, 72vh) scale(1.25); }
+}
+@keyframes drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(48vw, -48vh) scale(1.2); }
+  66%      { transform: translate(72vw, -12vh) scale(0.85); }
+}
+@keyframes drift-4 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%      { transform: translate(-58vw, -38vh) scale(1.2); }
+  70%      { transform: translate(-26vw, -68vh) scale(0.9); }
+}
+
+/* let the gradient show through the bars */
+body { background: transparent; }
+.site-header,
+.site-footer {
+  background: rgba(255, 246, 230, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.flowbar {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ───────── Scroll reveal: soft pop, replays whenever you scroll back to it ─────────
+   Uses the individual translate/scale properties so it never fights an
+   element's own transform (like the tilted paper). */
+.js .reveal {
+  opacity: 0;
+  translate: 0 18px;
+  scale: 0.985;
+  transition:
+    opacity 520ms ease,
+    translate 620ms cubic-bezier(0.22, 0.8, 0.3, 1),
+    scale 620ms cubic-bezier(0.22, 0.8, 0.3, 1);
+  transition-delay: var(--d, 0ms);
+}
+.js .reveal:not(.is-in) { transition-delay: 0ms; transition-duration: 220ms; }
+.js .reveal.is-in { opacity: 1; translate: 0 0; scale: 1; }
+
+/* ───────── Headline shine (plays once on load) ───────── */
+.hero h1 { position: relative; }
+.shine-layer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  color: transparent;
+  background: linear-gradient(105deg, transparent 0 42%, rgba(255, 255, 255, 0.95) 50%, transparent 58% 100%) no-repeat;
+  background-size: 300% 100%;
+  background-position: 90% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: headline-shine 1.9s cubic-bezier(0.4, 0, 0.2, 1) 0.7s 1 both;
+}
+.hero h1 .shine-layer em { color: transparent; font-style: italic; }
+.shine-layer.is-done { display: none; }
+@keyframes headline-shine {
+  from { background-position: 90% 0; }
+  to   { background-position: 10% 0; }
+}
+
+/* ───────── Hero: real-paper invoice + glowing result ───────── */
+.hero-proof {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+.proof-topline { padding: 0 6px; }
+.paper-wrap {
+  position: relative;
+  filter: drop-shadow(0 0 1px rgba(29, 22, 40, 0.28))
+          drop-shadow(0 14px 22px rgba(29, 22, 40, 0.08));
+}
+.invoice-paper {
+  position: relative;
+  padding: 32px 28px 30px 56px;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink);
+  background-color: #fff;
+  background-image:
+    linear-gradient(90deg, transparent 38px, rgba(212, 80, 110, 0.16) 38px 39px, transparent 39px),
+    repeating-linear-gradient(180deg, transparent 0 27px, rgba(212, 175, 55, 0.06) 27px 28px);
+  background-position: 0 0, 0 14px;
+  clip-path: polygon(0 0, calc(100% - 30px) 0, 100% 30px, 100% 100%, 0 100%);
+}
+.invoice-paper .invoice-rule,
+.invoice-paper .invoice-total { border-color: var(--line); }
+.invoice-paper .invoice-rule { background: var(--line); }
+/* folded corner: flat flap */
+.invoice-paper::after {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  width: 30px; height: 30px;
+  background: var(--primary-soft);
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+.proof-result {
+  margin-top: 0;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(var(--plum), var(--plum)) padding-box,
+    conic-gradient(from var(--glow-angle), #D4AF37, #fff1c9, #b8932a, #e8c964, #D4AF37) border-box;
+  box-shadow: 0 0 18px rgba(212, 175, 55, 0.4), 0 0 50px -8px rgba(122, 92, 255, 0.35);
+  animation: glow-spin 6s linear infinite, glow-pulse 3.2s ease-in-out infinite;
+}
+@property --glow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes glow-spin { to { --glow-angle: 360deg; } }
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(212, 175, 55, 0.32), 0 0 40px -8px rgba(212, 175, 55, 0.28); }
+  50%      { box-shadow: 0 0 26px rgba(232, 201, 100, 0.6), 0 0 70px -6px rgba(212, 175, 55, 0.5); }
+}
+
+/* ───────── Footnote line + half-dot mascot ─────────
+   The line is drawn ABOVE the mascot (z-index) and the mascot's clip box ends
+   1px inside it, so the dot is seamlessly joined to the line. */
+.landing-footnote {
+  position: relative;
+  margin-top: 170px;
+  border-top: 0;
+}
+.landing-footnote::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--line);
+  z-index: 2;
+  pointer-events: none;
+}
+.landing-footnote::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 50%;
+  width: 300px; height: 1px;
+  translate: -50% 0;
+  background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.55);
+  z-index: 3;
+  pointer-events: none;
+}
+.footnote-text { margin: 0; }
+
+.mascot-peek {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% - 1px);
+  width: 260px;
+  height: 169px;
+  margin-left: -130px;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
+}
+.mascot {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 0 16px rgba(255, 210, 112, 0.886));
+}
+.js .mascot-peek .mascot {
+  transform: translateY(105%);
+  transition: transform 260ms ease;
+}
+.js .mascot-peek.is-in .mascot {
+  transform: none;
+  transition: transform 800ms cubic-bezier(0.22, 1.2, 0.36, 1) 150ms;
+}
+/* body stays put: only the eyes blink and the magnifying glass moves */
+.mascot-eye { transform-box: fill-box; transform-origin: center; animation: mascot-blink 5s infinite; }
+.mascot-glass { transform-origin: 164px 128px; animation: mascot-search 4.8s ease-in-out infinite; }
+@keyframes mascot-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes mascot-search {
+  0%, 100% { transform: rotate(-5deg); }
+  35%      { transform: rotate(7deg); }
+  70%      { transform: rotate(-9deg); }
+}
+
+@media (max-width: 768px) {
+  .landing-footnote { margin-top: 160px; }
+  .paper-wrap { transform: rotate(-0.8deg); }
+}
+
+/* ───────── Reduced motion ─────────
+   Everything decorative stops, except the background drift, which keeps
+   going very slowly so the page still feels alive. Delete the .aurora lines
+   below if you want it fully still for these users. */
+@media (prefers-reduced-motion: reduce) {
+  .mascot-eye, .mascot-glass, .proof-result, .shine-layer { animation: none !important; }
+  .shine-layer { display: none; }
+  .js .reveal { opacity: 1; translate: 0 0; scale: 1; transition: none; }
+  .js .mascot-peek .mascot { transform: none; transition: none; }
+  .aurora, .aurora i { animation-duration: 90s !important; animation-iteration-count: infinite !important; }
+}
+.feature-band > h3 {
+  grid-column: 1 / -1;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-strong);
+}
+.hero {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  text-align: center;
+}
+.hero-copy { max-width: 760px; }
+.hero h1 { max-width: 14ch; margin-left: auto; margin-right: auto; }
+.hero-lede { margin-left: auto; margin-right: auto; }
+.hero-actions, .privacy-line { justify-content: center; }
+
+/* hide the snapshot sidebar and the float clock */
+.review-aside,
+.clock-card {
+  display: none;
+}
+
+/* center the review screen now that the sidebar is gone */
+.review-layout {
+  grid-template-columns: minmax(0, 720px);
+  justify-content: center;
+}
+.review-heading {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.review-heading .eyebrow {
+  justify-content: center;
+}
+.review-heading .lede {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* center the buttons on the results screen */
+.result-actions {
+  justify-content: center;
 }

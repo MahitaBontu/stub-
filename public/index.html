@@ -5,57 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Stub — See the cost of late payment</title>
   <meta name="description" content="Stub turns one unpaid invoice into a clear estimate of what late payment costs — and a plain-English terms conversation.">
+  <script>document.documentElement.classList.add("js");</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <a class="skip-link" href="#main">Skip to content</a>
 
   <svg class="icon-sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
-    <symbol id="i-arrow-right" viewBox="0 0 24 24">
-      <path d="M5 12h14M13 6l6 6-6 6"/>
-    </symbol>
-    <symbol id="i-arrow-left" viewBox="0 0 24 24">
-      <path d="M19 12H5M11 18l-6-6 6-6"/>
-    </symbol>
-    <symbol id="i-upload" viewBox="0 0 24 24">
-      <path d="M12 16V4M6 10l6-6 6 6M4 20h16"/>
-    </symbol>
-    <symbol id="i-lock" viewBox="0 0 24 24">
-      <rect x="4" y="10" width="16" height="11" rx="2"/>
-      <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
-    </symbol>
-    <symbol id="i-file" viewBox="0 0 24 24">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-      <path d="M14 2v6h6M8 13h8M8 17h5"/>
-    </symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M12 7v5l3 2"/>
-    </symbol>
-    <symbol id="i-message" viewBox="0 0 24 24">
-      <path d="M4 5h16v12H8l-4 4z"/>
-      <path d="M8 9h8M8 13h5"/>
-    </symbol>
-    <symbol id="i-ranking" viewBox="0 0 24 24">
-      <path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/>
-    </symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24">
-      <rect x="9" y="9" width="11" height="11" rx="2"/>
-      <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>
-    </symbol>
-    <symbol id="i-check" viewBox="0 0 24 24">
-      <path d="M20 6 9 17l-5-5"/>
-    </symbol>
-    <symbol id="i-alert" viewBox="0 0 24 24">
-      <circle cx="12" cy="12" r="9"/>
-      <path d="M12 7.5v5M12 16.5h.01"/>
-    </symbol>
-    <symbol id="i-spark" viewBox="0 0 24 24">
-      <path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/>
-    </symbol>
+    <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 18l-6-6 6-6"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-message" viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 4z"/><path d="M8 9h8M8 13h5"/></symbol>
+    <symbol id="i-ranking" viewBox="0 0 24 24"><path d="M4 20V11M10 20V5M16 20v-6M22 20H2"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16.5h.01"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M17.7 6.3l-2.8 2.8M9.1 14.9l-2.8 2.8"/></symbol>
   </svg>
 
   <header class="site-header">
@@ -87,67 +59,37 @@
       <div class="landing-inner">
         <div class="hero">
           <div class="hero-copy">
-            <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>The cost of waiting, made visible</p>
-            <h1 id="landing-title">Late payment has a price. <em>Now you can see it.</em></h1>
-            <p class="hero-lede">Stub reads one invoice and puts a number on the wait. The cost of float is simply what it costs you to have your cash tied up for those extra days — and it is a number you can use in the next terms conversation.</p>
+            <h1 id="landing-title">Delayed payments can cost you. <em> Stub prevents that. </em><span class="shine-layer" aria-hidden="true">Delayed payments can cost you. <em> Stub prevents that. </em></span></h1>
+            <p class="hero-lede">By scanning one invoice, Stub can identify hidden costs of your payment terms and negotiate that money back.</p>
             <div class="hero-actions">
               <button class="button button-primary" type="button" data-action="choose-scan">
                 Scan an invoice
                 <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-right"></use></svg>
               </button>
-              <button class="button button-secondary" type="button" data-action="demo">See it with demo data</button>
+              <button class="button button-secondary" type="button" data-action="demo">Try it with demo data</button>
             </div>
             <p class="privacy-line">
               <svg class="od-icon" aria-hidden="true"><use href="#i-lock"></use></svg>
-              Files stay in this browser session. No bank connection. No payment chasing.
+              Files stay in this browser session.
             </p>
           </div>
 
-          <div class="hero-proof" aria-label="Example invoice and estimated cost of float">
-            <div class="proof-topline">
-              <span class="proof-tag">Example · INV-2048</span>
-              <span class="proof-terms"><span class="proof-dot" aria-hidden="true"></span>Net 75</span>
-            </div>
-            <div class="invoice-paper">
-              <div class="invoice-head">
-                <div class="invoice-identity">
-                  <span class="invoice-from">Your business</span>
-                  <span class="invoice-to">Invoice to Ridgeline Fabrication</span>
-                </div>
-                <span class="invoice-days">75<small>days</small></span>
-              </div>
-              <div class="invoice-rule"></div>
-              <div class="invoice-line"><span>Design retainer</span><span>$32,000.00</span></div>
-              <div class="invoice-line"><span>Production setup</span><span>$16,000.00</span></div>
-              <div class="invoice-total"><span>Amount due</span><strong>$48,000.00</strong></div>
-              <div class="invoice-dates"><span>Issued Aug 14</span><span>Due Oct 28</span></div>
-            </div>
-            <div class="proof-result">
-              <div>
-                <span class="proof-label">Estimated cost of float</span>
-                <strong class="proof-number">$936.99</strong>
-                <span class="proof-note">what 75 days of waiting costs at a 9.5% yearly rate</span>
-              </div>
-              <div class="proof-clock">
-                <span class="proof-live"><span class="pulse-dot" aria-hidden="true"></span>Live clock</span>
-                <strong class="proof-rate">$0.000145<small>/sec</small></strong>
-              </div>
-            </div>
-          </div>
+          
         </div>
 
-        <div class="feature-band" aria-label="What Stub does">
+        <div class="feature-band" aria-label="What Stub does"><h3>What we give you:</h3>
+        
           <article class="feature">
             <span class="feature-index">01</span>
             <div>
-              <h2>Float Clock</h2>
+              <h2>Cost of Float</h2>
               <p>A running total of what the wait costs, updated every second — not a surprise at the end of a spreadsheet.</p>
             </div>
           </article>
           <article class="feature">
             <span class="feature-index">02</span>
             <div>
-              <h2>Terms letter</h2>
+              <h2>Negotiate Terms</h2>
               <p>Turns the difference into a short, plain-English message you can copy and send.</p>
             </div>
           </article>
@@ -160,7 +102,36 @@
           </article>
         </div>
 
-        <p class="landing-footnote">A prototype for small businesses. Not accounting, legal, or financial advice.</p>
+
+        <div class="landing-footnote">
+          <div class="mascot-peek">
+            <svg class="mascot" viewBox="0 0 200 130" role="img" aria-label="A friendly half-dot mascot holding a magnifying glass, peeking up from behind the line">
+              <defs>
+                <linearGradient id="dot-body" x1="0" y1="0" x2="0.3" y2="1">
+                  <stop offset="0" stop-color="#a3305f"/>
+                  <stop offset="0.55" stop-color="#660033"/>
+                  <stop offset="1" stop-color="#470023"/>
+                </linearGradient>
+                <mask id="dot-face" maskUnits="userSpaceOnUse" x="0" y="0" width="200" height="130">
+                  <rect width="200" height="130" fill="#fff"/>
+                  <circle class="mascot-eye" cx="74" cy="90" r="7" fill="#000"/>
+                  <circle class="mascot-eye" cx="126" cy="88" r="9" fill="#000"/>
+                  <path d="M84 111 Q98 123 112 111" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"/>
+                </mask>
+              </defs>
+              <g class="mascot-body">
+                <circle cx="100" cy="134" r="82" fill="url(#dot-body)" mask="url(#dot-face)"/>
+                <path d="M38 108 A67 67 0 0 1 74 72" fill="none" stroke="#f0d98a" stroke-opacity="0.55" stroke-width="4" stroke-linecap="round"/>
+              </g>
+              <g class="mascot-glass">
+                <line x1="142" y1="100" x2="172" y2="136" stroke="#3d0020" stroke-width="9" stroke-linecap="round"/>
+                <circle cx="128" cy="86" r="20" fill="#fff1c9" fill-opacity="0.28" stroke="#3d0020" stroke-width="6"/>
+                <path d="M116 80 Q118 72 126 70" fill="none" stroke="#fffbf0" stroke-opacity="0.85" stroke-width="3" stroke-linecap="round"/>
+              </g>
+            </svg>
+          </div>
+          <p class="footnote-text">Estimates are for informational purposes, and do not constitute financial or legal advice.</p>
+        </div>
       </div>
     </section>
 
@@ -173,7 +144,7 @@
         <div class="screen-heading">
           <p class="eyebrow">Step 1 · Invoice intake</p>
           <h1 id="scan-title">Start with one invoice.</h1>
-          <p class="lede">Upload an image or PDF.</p>
+          <p class="lede">Upload an image or PDF. Stub pulls out the amount, payment terms, due date, and customer — then you confirm every field before any math runs.</p>
         </div>
 
         <div class="scan-layout">
@@ -184,8 +155,8 @@
                 <span class="drop-icon" aria-hidden="true">
                   <svg class="od-icon od-icon-lg" aria-hidden="true"><use href="#i-upload"></use></svg>
                 </span>
-                <span class="drop-title">Drop an invoice here</span>
-                <span class="drop-copy" id="file-hint">JPG, PNG, WebP, or PDF · up to 10 MB</span>
+                <span class="drop-title">Drag or upload an invoice here</span>
+                <span class="drop-copy" id="file-hint">File types permitted:JPG, PNG, WebP, or PDF · up to 10 MB</span>
                 <span class="drop-button">Choose a file</span>
               </label>
               <div class="demo-row">
@@ -194,7 +165,7 @@
               </div>
               <p class="quiet-note">
                 <svg class="od-icon" aria-hidden="true"><use href="#i-lock"></use></svg>
-                Nothing is sent to a bank or to your customers.
+                Your data is private.
               </p>
             </div>
 
@@ -211,16 +182,16 @@
           </div>
 
           <aside class="scan-aside">
-            <p class="eyebrow">What Stub looks for</p>
+            <p class="eyebrow">Your document should contain:</p>
             <ul class="check-list">
-              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Invoice amount</strong><small>The cash that is tied up.</small></span></li>
-              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Payment terms</strong><small>Net 30, 30 days, or a specific due date.</small></span></li>
-              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Customer name</strong><small>So you can compare across invoices.</small></span></li>
-              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Discount clause</strong><small>Optional. Flagged for review if missing.</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Invoice amount</strong><small>Uncollected revenue.</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Payment terms</strong><small>Time frame for payment. ex. Net 30</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Customer name</strong><small>Used to track and compare invoice contributions.</small></span></li>
+              <li><svg class="od-icon" aria-hidden="true"><use href="#i-check"></use></svg><span><strong>Discount clause</strong><small>Optional. Enter if applicable.</small></span></li>
             </ul>
             <div class="aside-note">
               <svg class="od-icon" aria-hidden="true"><use href="#i-alert"></use></svg>
-              <p>The read is only a starting point. You confirm every field on the next screen.</p>
+              <p>These elements must be present for Stub to process your invoice.</p>
             </div>
           </aside>
         </div>
@@ -246,8 +217,7 @@
 
             <div class="form-grid">
               <div class="field" data-field="customer">
-                <label for="field-customer">Customer <span class="required-mark" aria-hidden="true">*</span> </label>
-                <input id="field-customer" name="customer" type="text" autocomplete="organization" maxlength="80" required aria-describedby="helper-customer error-customer">
+                <label for="field-customer">Customer <span class="required-mark" aria-hidden="true">*</span> <span class="field-flag" id="flag-customer" hidden>Check this</span></label>                <input id="field-customer" name="customer" type="text" autocomplete="organization" maxlength="80" required aria-describedby="helper-customer error-customer">
                 <p class="field-helper" id="helper-customer">Who is this invoice from?</p>
                 <p class="field-error" id="error-customer" hidden></p>
               </div>
@@ -280,7 +250,7 @@
               </div>
 
               <div class="field field-full" data-field="discountTerms">
-                <label for="field-discount">Early-payment discount <span class="optional-mark">Optional</span></label>
+                <label for="field-discount">Early-payment discount <span class="optional-mark">Optional</span> <span class="field-flag" id="flag-discount" hidden>Not detected</span></label>
                 <input id="field-discount" name="discountTerms" type="text" maxlength="60" placeholder="e.g. 2/10 Net 30" aria-describedby="helper-discount error-discount">
                 <p class="field-helper" id="helper-discount">Leave blank if the invoice has no discount clause. Stub will never guess one.</p>
                 <p class="field-error" id="error-discount" hidden></p>
@@ -549,9 +519,9 @@
 
     <section class="screen app-screen" id="screen-ranking" aria-labelledby="ranking-title" hidden>
       <div class="app-inner">
-        <button class="back-link" type="button" data-action="back-results">
+        <button class="back-link" type="button" data-action="back-ranking">
           <svg class="od-icon" aria-hidden="true"><use href="#i-arrow-left"></use></svg>
-          Back to the invoice
+          <span class="back-label">Back to the invoice</span>
         </button>
         <div class="results-heading ranking-heading">
           <div>
@@ -595,7 +565,7 @@
 
         <div class="result-actions">
           <button class="button button-secondary" type="button" data-action="choose-scan">Scan another invoice</button>
-          <button class="text-link" type="button" data-action="back-results">Back to the invoice</button>
+          <button class="text-link" type="button" data-action="back-ranking"><span class="back-label">Back to the invoice</span></button>
         </div>
       </div>
     </section>
@@ -626,14 +596,60 @@
 
   <footer class="site-footer">
     <div class="footer-inner">
-      <span class="footer-brand">stub<span aria-hidden="true">.</span></span>
-      <p>The cost of waiting, made visible. Prototype only — not accounting, legal, or financial advice.</p>
-      <span class="footer-note">No bank connection. No payment chasing.</span>
+      <span class="footer-brand">save money with stub<span aria-hidden="true"></span></span>
+      <span class="footer-note"></span>
     </div>
   </footer>
 
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
   <script src="app.js" defer></script>
+  <script src="app-fixes.js" defer></script>
+  <script>
+  (() => {
+    const groups = [
+      ".hero-copy > *", ".hero-proof > *", ".feature", ".footnote-text",
+      ".app-inner > .back-link", ".app-inner > .screen-heading", ".app-inner > .results-heading",
+      ".app-inner > .clock-card", ".app-inner > .method-note", ".app-inner > .result-actions",
+      ".app-inner > .negotiation-actions", ".app-inner > .ranking-summary", ".app-inner > .rank-board",
+      ".app-inner > .ranking-note", ".app-inner > .empty-state", ".app-inner > .error-card",
+      ".scan-layout > *", ".review-layout > *", ".result-grid > *",
+      ".negotiation-layout > .slider-panel", ".negotiation-layout .impact-tile",
+      ".letter-layout > *"
+    ];
+    const sel = groups.join(",");
+
+    // One observer for every screen: pops in when it enters the viewport,
+    // resets once it has fully left, so it plays again next time you scroll to it.
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => e.target.classList.toggle("is-in", e.isIntersecting));
+    }, { threshold: 0, rootMargin: "0px 0px -5% 0px" });
+
+    const tag = (el) => {
+      if (el.nodeType !== 1 || el.classList.contains("reveal")) return;
+      el.classList.add("reveal");
+      const sibs = [...el.parentElement.children].filter((c) => c.matches(sel));
+      el.style.setProperty("--d", Math.min(Math.max(0, sibs.indexOf(el)) * 70, 280) + "ms");
+      io.observe(el);
+    };
+    const tagTree = (root) => {
+      if (root.nodeType !== 1) return;
+      if (root.matches(sel)) tag(root);
+      root.querySelectorAll(sel).forEach(tag);
+    };
+
+    tagTree(document.getElementById("main"));
+    // content the app renders later (new rows, etc.) gets the same treatment
+    new MutationObserver((muts) => muts.forEach((m) => m.addedNodes.forEach(tagTree)))
+      .observe(document.getElementById("main"), { childList: true, subtree: true });
+
+    const peek = document.querySelector(".mascot-peek");
+    if (peek) io.observe(peek);
+
+    // headline shine plays once, then is removed so it never replays
+    const shine = document.querySelector(".shine-layer");
+    if (shine) shine.addEventListener("animationend", () => shine.classList.add("is-done"), { once: true });
+  })();
+  </script>
 </body>
 </html>

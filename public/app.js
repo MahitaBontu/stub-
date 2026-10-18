@@ -52,6 +52,7 @@ const state = {
     current: null,
     session: [],
     proposedDays: 30,
+    rankingFrom: "",
     uploadName: "",
     scanTimers: [],
     scanning: false,
@@ -843,35 +844,44 @@ function retrieveCustomerHistory(customerName) {
   );
   if (priorInvoices.length === 0) return null;
 
+
   const avgTerms = Math.round(
     priorInvoices.reduce((sum, inv) => sum + inv.termsDays, 0) / priorInvoices.length
   );
   const totalAmount = priorInvoices.reduce((sum, inv) => sum + inv.amount, 0);
 
+
   return `${priorInvoices.length} prior invoice${priorInvoices.length === 1 ? "" : "s"} on file for ${customerName} (${formatMoney(totalAmount)} total), averaging Net ${avgTerms} terms.`;
 }
+
 
 function buildLeverageLetter() {
   const invoice = state.current;
   if (!invoice) return "";
 
+
   const proposed = state.proposedDays;
   const costOfFloat = calcCostOfFloat(invoice.amount, invoice.termsDays);
-  const freedCash = calcFreedCash(invoice.amount, invoice.termsDays, proposed);
-  const annualSavings = calcAnnualSavings(invoice.amount, invoice.termsDays, proposed);
+  const savedPerInvoice = calcSavingsPerInvoice(invoice.amount, invoice.termsDays, proposed);  const annualSavings = calcAnnualSavings(invoice.amount, invoice.termsDays, proposed);
   const history = retrieveCustomerHistory(invoice.customer);
+
 
   return `Hi ${invoice.customer} team,
 
+
 I wanted to raise something practical about our payment terms. Our current Net ${invoice.termsDays} arrangement keeps ${formatMoney(invoice.amount)} tied up for ${invoice.termsDays} days after each invoice. At a 9.5% annual cost of capital — a standard estimate of what that cash could earn elsewhere — the delay costs us about ${formatMoney(costOfFloat)} per invoice.
 
-We value working with you, and I think there is a straightforward improvement for both of us: moving to Net ${proposed} would free about ${formatMoney(freedCash)} in cash per invoice cycle. Across ${INVOICES_PER_YEAR} invoices a year, that is roughly ${formatMoney(annualSavings)} back into the business.
+
+We value working with you, and I think there is a straightforward improvement for both of us: moving to Net ${proposed} would cut that financing cost by about ${formatMoney(savedPerInvoice)} per invoice cycle. Across ${INVOICES_PER_YEAR} invoices a year, that is roughly ${formatMoney(annualSavings)} back into the business.
+
 
 Would you be open to updating our terms to Net ${proposed} for future invoices? Happy to talk through what works on your side.
+
 
 Thanks,
 [Your name]${history ? `\n\n(Context: ${history})` : ""}`;
 }
+
 
 function openLetter() {
     if (!state.current)
@@ -1026,6 +1036,7 @@ function renderRanking() {
     });
 }
 function openRanking() {
+    if (state.screen !== "ranking") state.rankingFrom = state.screen;
     renderRanking();
     showScreen("ranking");
 }
@@ -1115,6 +1126,19 @@ function handleAction(action) {
                 showScreen("negotiation");
             }
             else {
+                showScreen("landing");
+            }
+            break;
+                case "back-ranking":
+            if (state.current) {
+                if (state.rankingFrom === "negotiation") {
+                    renderNegotiation();
+                    showScreen("negotiation");
+                } else {
+                    renderResults();
+                    showScreen("results");
+                }
+            } else {
                 showScreen("landing");
             }
             break;
